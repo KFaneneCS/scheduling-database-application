@@ -1,9 +1,8 @@
-package utility;
+package helper;
 
-import java.sql.Connection;
 import java.sql.DriverManager;
 
-public abstract class JDBC {
+public abstract class Connection {
 
     private static final String protocol = "jdbc";
     private static final String vendor = ":mysql:";
@@ -13,29 +12,27 @@ public abstract class JDBC {
     private static final String driver = "com.mysql.cj.jdbc.Driver"; // Driver reference
     private static final String userName = "sqlUser"; // Username
     private static final String password = "Passw0rd!"; // Password
-    public static Connection connection;  // Connection Interface
+    public static java.sql.Connection connection;  // Connection Interface
 
     public static void openConnection()
     {
         try {
             Class.forName(driver); // Locate Driver
             connection = DriverManager.getConnection(jdbcUrl, userName, password); // Reference Connection object
-            System.out.println("Connection successful!\n");  // FIXME: RWC
+            System.out.println("~Connection successful!\n");  // FIXME: DWC
         }
         catch(Exception e)
         {
-            System.out.println("Error:" + e.getMessage());  // FIXME: RWC
+            System.out.println("~Error:" + e.getMessage());  // FIXME: DWC
         }
     }
 
     public static void closeConnection() {
         try {
             connection.close();
-            System.out.println("Connection closed!");  // FIXME: RWC
-        }
-        catch(Exception e)
-        {
-            System.out.println("Error:" + e.getMessage());
+            System.out.println("~Connection closed!");  // FIXME: DWC
+        } catch(Exception e) {
+            AlertPopups.generateErrorMessage(e.getMessage());
         }
     }
 }

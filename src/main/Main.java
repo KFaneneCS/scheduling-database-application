@@ -5,43 +5,49 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import utility.JDBC;
+import helper.Connection;
 
 import java.sql.SQLException;
-import java.time.*;
-import java.time.format.DateTimeFormatter;
 import java.util.Objects;
-import java.util.TimeZone;
 
 public class Main extends Application {
+
     @Override
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/view/Login.fxml")));
-        stage.setTitle("First Screen");
         stage.setScene(new Scene(root));
         stage.show();
     }
 
-    // FIXME:  TEST CHANGE~~~
     public static void main(String[] args) throws SQLException {
-        JDBC.openConnection();
+        Connection.openConnection();
 
-/*        // FIXME:  Testing
-        int rowsAffected = TestTableQuery.delete(3);
-        if(rowsAffected > 0) {
-            System.out.println("Insert successful");
-        }
-        else {
-            System.out.println("Insert FAILED");
-        }
+//        // FIXME:  Testing
+//        int rowsAffected = Query.delete(3);
+//        if(rowsAffected > 0) {
+//            System.out.println("Insert successful");
+//        }
+//        else {
+//            System.out.println("Insert FAILED");
+//        }
 
-        TestTableQuery.select(2);*/
+//        // Testing query to get date, then various conversions
+//        ZonedDateTime appointmentDate = Query.getAppointmentDate(1);
+//        System.out.println("Appointment Date fetched from database: " + appointmentDate);
+//        ZonedDateTime appointmentDateToLocal = TimeConversion.convertUTCToLocal(appointmentDate);
+//        System.out.println("Converted to Local: " + appointmentDateToLocal);
+//        ZonedDateTime appointmentDateBackToUTC = TimeConversion.convertLocalToUTC(appointmentDateToLocal);
+//        System.out.println("Converted BACK to UTC: " + appointmentDateBackToUTC);
+//        ZonedDateTime appointmentDateToEST = TimeConversion.convertUTCToEST(appointmentDateBackToUTC);
+//        System.out.println("Converted UTC to Eastern: " + appointmentDateToEST);
 
-//        TimeZoneHelper.displayZoneIds();
-//        TimeZoneHelper.displayZoneIds("Europe");
+//        System.out.println(LocalDateTime.parse(appointmentDate));
+
+//        TimeConversion.displayZoneIds();
+//        TimeConversion.displayZoneIds("Europe");
 
         // .of() used to explicitly create a ZonedDateTime object
-        LocalDate parisDate = LocalDate.of(2022, 12, 13);
+/*        LocalDate parisDate = LocalDate.of(2022, 12, 13);
         LocalTime parisTime = LocalTime.of(5, 0);
         ZoneId parisZoneId = ZoneId.of("Europe/Paris");
         ZonedDateTime parisZDT = ZonedDateTime.of(parisDate, parisTime, parisZoneId);
@@ -72,21 +78,33 @@ public class Main extends Application {
         System.out.println("BEFORE: " + parisDateTime);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedParisDateTime = parisDateTime.format(formatter);
-        System.out.println("AFTER: " + formattedParisDateTime);
+        System.out.println("AFTER: " + formattedParisDateTime);*/
 
 
+//        TimeConversion.convertLocalToUTC();
+
+        // Change local to French for testing
+//        Locale.setDefault(new Locale("fr", "FR"));
+//
+//        Locale userLocale = Locale.getDefault();
+
+//        if (userLocale.getLanguage().equalsIgnoreCase("fr")) {
+//            isFrench = true;
+//        }
 
 
-
-
-
-
-
-
-
-
+//        String resourceBundlePath = "translation/Nat";
+//        ResourceBundle rb = ResourceBundle.getBundle(resourceBundlePath, Locale.getDefault());
+//
+//        try {
+//            if (Locale.getDefault().getLanguage().equals("fr")) {
+//                isFrench = true;
+//            }
+//        } catch (Exception e) {
+//            System.out.println("Error: " + e);
+//        }
 
         launch(args);
-        JDBC.closeConnection();
+        Connection.closeConnection();
     }
 }

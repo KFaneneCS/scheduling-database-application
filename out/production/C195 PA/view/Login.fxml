@@ -15,9 +15,9 @@
          <children>
             <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0" prefHeight="98.0" prefWidth="390.0">
                <children>
-                  <Label text="USER LOGIN">
+                  <Label fx:id="loginLabel" text="LOGIN">
                      <font>
-                        <Font name="System Bold" size="18.0" />
+                        <Font size="24.0" />
                      </font>
                      <HBox.margin>
                         <Insets left="30.0" top="20.0" />
@@ -48,7 +48,7 @@
             </HBox>
             <HBox alignment="CENTER" layoutX="10.0" layoutY="110.0" prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <Button fx:id="loginButton" mnemonicParsing="false" onAction="#onActionLogin" prefHeight="34.0" prefWidth="260.0" text="LOGIN">
+                  <Button fx:id="loginButton" mnemonicParsing="false" onAction="#onActionLogin" prefHeight="34.0" prefWidth="260.0" text="Login">
                      <HBox.margin>
                         <Insets bottom="20.0" />
                      </HBox.margin>
@@ -57,7 +57,7 @@
             </HBox>
             <HBox alignment="TOP_CENTER" layoutX="10.0" layoutY="237.0" prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <Label fx:id="loginLanguageLabel" text="FIXME: Language">
+                  <Label fx:id="userLocationLabel" text="user_location">
                      <font>
                         <Font name="System Italic" size="12.0" />
                      </font>
