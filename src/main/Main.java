@@ -1,11 +1,11 @@
 package main;
 
+import helper.JDBC;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import helper.Connection;
 
 import java.sql.SQLException;
 import java.util.Objects;
@@ -13,6 +13,7 @@ import java.util.Objects;
 public class Main extends Application {
 
     @Override
+
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/view/Login.fxml")));
         stage.setScene(new Scene(root));
@@ -20,7 +21,7 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) throws SQLException {
-        Connection.openConnection();
+        JDBC.openConnection();
 
 //        // FIXME:  Testing
 //        int rowsAffected = Query.delete(3);
@@ -105,6 +106,7 @@ public class Main extends Application {
 //        }
 
         launch(args);
-        Connection.closeConnection();
+        JDBC.closeConnection();
     }
+
 }

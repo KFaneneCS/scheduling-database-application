@@ -1,33 +1,29 @@
 package controller;
 
-import javafx.application.Platform;
+import helper.Query;
+import helper.ScreenChanger;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 
+import java.io.IOException;
 import java.net.URL;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.ResourceBundle;
 
-public class CustomerController {
+public class CustomerController implements Initializable {
 
-    Stage stage;
-    private TableView tableview;
     private ObservableList<ObservableList> data;
-    private static Connection connection;
+    ScreenChanger screenChanger = new ScreenChanger();
 
     @FXML
     private Button addButton;
@@ -39,7 +35,7 @@ public class CustomerController {
     private Label customersLabel;
 
     @FXML
-    private TableView<?> customersTableView;
+    private TableView<ObservableList> customersTableView;
 
     @FXML
     private Button deleteButton;
@@ -58,8 +54,8 @@ public class CustomerController {
     }
 
     @FXML
-    void onActionDisplayWelcome(ActionEvent event) {
-        System.out.println("Back button pressed");
+    void onActionDisplayWelcome(ActionEvent event) throws IOException {
+        screenChanger.changeScreen(event, "Welcome");
     }
 
     @FXML
@@ -67,71 +63,47 @@ public class CustomerController {
         System.out.println("Update customer button pressed");
     }
 
+
     public void fillCustomersTable() {
         data = FXCollections.observableArrayList();
         try {
-            //SQL FOR SELECTING ALL OF CUSTOMER
-            String SQL = "SELECT * FROM client_schedule.customers";
-            //ResultSet
-            ResultSet rs = connection.createStatement().executeQuery(SQL);
 
-            /**
-             * ********************************
-             * TABLE COLUMN ADDED DYNAMICALLY *
-             *********************************
-             */
+            ResultSet rs = Query.selectAllCustomers();
+
             for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
-                //We are using non property style for making dynamic table
                 final int j = i;
-                TableColumn column = new TableColumn(rs.getMetaData().getColumnName(i + 1));
-                column.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>() {
+                TableColumn col = new TableColumn(rs.getMetaData().getColumnName(i + 1));
+                col.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>() {
                     public ObservableValue<String> call(TableColumn.CellDataFeatures<ObservableList, String> param) {
-                        return new SimpleStringProperty(param.getValue().get(j).toString());
+                        try {
+                            return new SimpleStringProperty(param.getValue().get(j).toString());
+                        } catch (NullPointerException npe) {
+                            return new SimpleStringProperty("null");
+                        }
                     }
                 });
-
-                tableview.getColumns().addAll(column);
-                System.out.println("Column [" + i + "] ");
+                customersTableView.getColumns().addAll(col);
             }
 
-            /**
-             * ******************************
-             * Data added to ObservableList *
-             *******************************
-             */
             while (rs.next()) {
-                //Iterate Row
                 ObservableList<String> row = FXCollections.observableArrayList();
                 for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-                    //Iterate Column
                     row.add(rs.getString(i));
                 }
-                System.out.println("Row [1] added " + row);
                 data.add(row);
-
             }
 
-            //FINALLY ADDED TO TableView
-            tableview.setItems(data);
+            //Added to customerTableview
+            customersTableView.setItems(data);
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Error on Building Data");
+            System.out.println(e.getMessage());
         }
     }
 
+    @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        tableview = new TableView();
+        System.out.println("~CustomerController initialized");
         fillCustomersTable();
-        Scene scene = new Scene(tableview);
-        stage.setScene(scene);
-        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent event) {
-                Platform.exit();
-                System.exit(0);
-            }
-        });
-        stage.show();
     }
 
 }

@@ -12,7 +12,7 @@ public abstract class Query {
 
     public static int convertToUserId(String username) throws SQLException {
         String sql = "SELECT * FROM users WHERE User_Name = ?";
-        PreparedStatement ps = Connection.connection.prepareStatement(sql);
+        PreparedStatement ps = JDBC.connection.prepareStatement(sql);
         ps.setString(1, username);
         ResultSet rs = ps.executeQuery();
 
@@ -25,7 +25,7 @@ public abstract class Query {
     // FIXME
     public static String checkPassword(int id) throws SQLException {
         String sql = "SELECT * FROM users WHERE User_ID = ?";
-        PreparedStatement ps = Connection.connection.prepareStatement(sql);
+        PreparedStatement ps = JDBC.connection.prepareStatement(sql);
         ps.setInt(1, id);
         ResultSet rs = ps.executeQuery();
 
@@ -38,7 +38,7 @@ public abstract class Query {
     // Updaters
     public static int insert(int newId, String newCustomer) throws SQLException {
         String sql = "INSERT INTO test_table (id, customer) VALUES (?, ?)";
-        PreparedStatement ps = Connection.connection.prepareStatement(sql);
+        PreparedStatement ps = JDBC.connection.prepareStatement(sql);
         ps.setInt(1, newId);
         ps.setString(2, newCustomer);
         return ps.executeUpdate();
@@ -46,7 +46,7 @@ public abstract class Query {
 
     public static int update(int customerId, String customerName) throws SQLException {
         String sql = "UPDATE test_table SET customer = ? WHERE id = ?";
-        PreparedStatement ps = Connection.connection.prepareStatement(sql);
+        PreparedStatement ps = JDBC.connection.prepareStatement(sql);
         ps.setString(1, customerName);
         ps.setInt(2, customerId);
         return ps.executeUpdate();
@@ -54,16 +54,16 @@ public abstract class Query {
 
     public static int delete(int customerId) throws SQLException {
         String sql = "DELETE FROM test_table WHERE id = ?";
-        PreparedStatement ps = Connection.connection.prepareStatement(sql);
+        PreparedStatement ps = JDBC.connection.prepareStatement(sql);
         ps.setInt(1, customerId);
         return ps.executeUpdate();
     }
 
     // Queries
     // FIXME:  Need to finish this one including ZDT return type
-    public static void getAppointmentDate() throws SQLException {
+    public static void selectAppointmentDate() throws SQLException {
         String sql = "SELECT * FROM test_table";
-        PreparedStatement ps = Connection.connection.prepareStatement(sql);
+        PreparedStatement ps = JDBC.connection.prepareStatement(sql);
         ResultSet rs = ps.executeQuery();
         while (rs.next()) {
             int customerId = rs.getInt("id");
@@ -74,9 +74,9 @@ public abstract class Query {
     }
 
     // FIXME
-    public static ZonedDateTime getAppointmentDate(int appointmentId) throws SQLException {
+    public static ZonedDateTime selectAppointmentDate(int appointmentId) throws SQLException {
         String sql = "SELECT * FROM client_schedule.appointments WHERE Appointment_ID = ?";
-        PreparedStatement ps = Connection.connection.prepareStatement(sql);
+        PreparedStatement ps = JDBC.connection.prepareStatement(sql);
         ps.setInt(1, appointmentId);
         ResultSet rs = ps.executeQuery();
         String dateTimeFromDB = null;
@@ -89,6 +89,10 @@ public abstract class Query {
         return ZonedDateTime.of(localDateTime, zoneId);
     }
 
+    public static ResultSet selectAllCustomers() throws SQLException{
+        String sql = "SELECT * FROM client_schedule.customers";
+        return JDBC.connection.createStatement().executeQuery(sql);
+    }
 
 
 }

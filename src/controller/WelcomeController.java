@@ -1,22 +1,20 @@
 package controller;
 
+import helper.AlertPopups;
+import helper.ScreenChanger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.stage.Stage;
-import helper.AlertPopups;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class WelcomeController {
+public class WelcomeController implements Initializable{
 
-    Stage stage;
+    ScreenChanger screenChanger = new ScreenChanger();
     @FXML
     private Button appointmentsButton;
 
@@ -34,23 +32,12 @@ public class WelcomeController {
 
     @FXML
     void onActionDisplayAppointmentRecords(ActionEvent event) {
-        System.out.println("Appointment button clicked");
+        System.out.println("~Appointment button clicked");
     }
 
     @FXML
-    void onActionDisplayCustomerRecords(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("/view/Customer.fxml"));
-            loader.load();
-
-            stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-            Parent scene = loader.getRoot();
-            stage.setScene(new Scene(scene));
-            stage.show();
-        } catch (IOException e) {
-            AlertPopups.generateErrorMessage(e.getMessage());  // FIXME
-        }
+    void onActionDisplayCustomerRecords(ActionEvent event) throws IOException {
+        screenChanger.changeScreen(event, "Customer");
     }
 
     @FXML
@@ -61,8 +48,9 @@ public class WelcomeController {
     }
 
 
+    @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        System.out.println("WelcomeController initialized");
+        System.out.println("~WelcomeController initialized");
     }
 
 }

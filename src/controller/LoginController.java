@@ -1,17 +1,14 @@
 package controller;
 
+import helper.AlertPopups;
+import helper.Query;
+import helper.ScreenChanger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
-import helper.AlertPopups;
-import helper.Query;
 
 import java.io.IOException;
 import java.net.URL;
@@ -25,7 +22,7 @@ import static translation.Translation.translate;
 
 public class LoginController implements Initializable {
 
-    Stage stage;
+    ScreenChanger screenChanger = new ScreenChanger();
     @FXML
     private Button loginButton;
     @FXML
@@ -54,14 +51,7 @@ public class LoginController implements Initializable {
                 if (Objects.equals(Query.checkPassword(userId), providedPassword)) {
                     // Login successful, go to Records screen
                     try {
-                        FXMLLoader loader = new FXMLLoader();
-                        loader.setLocation(getClass().getResource("/view/Welcome.fxml"));
-                        loader.load();
-
-                        stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-                        Parent scene = loader.getRoot();
-                        stage.setScene(new Scene(scene));
-                        stage.show();
+                        screenChanger.changeScreen(event, "Welcome");
                     } catch (IOException e) {
                         AlertPopups.generateErrorMessage(e.getMessage());  // FIXME
                     }
@@ -78,7 +68,7 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        System.out.println("~LoginController is initialized!");
+        System.out.println("~LoginController is initialized");
 
         ZoneId userLocation = ZoneId.of(TimeZone.getDefault().getID());
         userLocationLabel.setText(userLocation.toString());
