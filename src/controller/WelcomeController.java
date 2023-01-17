@@ -1,7 +1,7 @@
 package controller;
 
-import helper.AlertPopups;
-import helper.ScreenChanger;
+import utility.AlertPopups;
+import utility.SceneChanger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -14,7 +14,7 @@ import java.util.ResourceBundle;
 
 public class WelcomeController implements Initializable{
 
-    ScreenChanger screenChanger = new ScreenChanger();
+    SceneChanger screenChanger = new SceneChanger();
     @FXML
     private Button appointmentsButton;
 
@@ -37,7 +37,11 @@ public class WelcomeController implements Initializable{
 
     @FXML
     void onActionDisplayCustomerRecords(ActionEvent event) throws IOException {
-        screenChanger.changeScreen(event, "Customer");
+        try {
+            screenChanger.changeScreen(event, "Customers");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @FXML

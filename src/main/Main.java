@@ -1,11 +1,11 @@
 package main;
 
-import helper.JDBC;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import utility.JDBC;
 
 import java.sql.SQLException;
 import java.util.Objects;
@@ -13,11 +13,19 @@ import java.util.Objects;
 public class Main extends Application {
 
     @Override
-
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/view/Login.fxml")));
-        stage.setScene(new Scene(root));
-        stage.show();
+        try {
+            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/view/Login.fxml")));
+            stage.setScene(new Scene(root));
+            stage.centerOnScreen();
+            stage.show();
+
+//            Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
+//            stage.setX((primScreenBounds.getWidth() - stage.getWidth()) / 2);
+//            stage.setY((primScreenBounds.getHeight() - stage.getHeight()) / 4);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) throws SQLException {

@@ -1,5 +1,7 @@
 package model;
 
+import utility.TimeConversion;
+
 import java.time.ZonedDateTime;
 
 public class Customer {
@@ -15,15 +17,15 @@ public class Customer {
     private String lastUpdatedBy;
     private int divisionId;
 
-    public Customer(int id, String name, String address, String postalCode, String phone, ZonedDateTime createDate, String createdBy, ZonedDateTime lastUpdate, String lastUpdatedBy, int divisionId) {
+    public Customer(int id, String name, String address, String postalCode, String phone, String createDate, String createdBy, String lastUpdate, String lastUpdatedBy, int divisionId) {
         this.id = id;
         this.name = name;
         this.address = address;
         this.postalCode = postalCode;
         this.phone = phone;
-        this.createDate = createDate;
+        this.createDate = TimeConversion.stringToZDT(createDate);
         this.createdBy = createdBy;
-        this.lastUpdate = lastUpdate;
+        this.lastUpdate = TimeConversion.stringToZDT(lastUpdate);
         this.lastUpdatedBy = lastUpdatedBy;
         this.divisionId = divisionId;
     }

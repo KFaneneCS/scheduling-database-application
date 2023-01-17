@@ -1,10 +1,14 @@
-package helper;
+package utility;
 
-import java.time.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.TimeZone;
 
 public class TimeConversion {
 
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     public static void displayZoneIds() {
         ZoneId.getAvailableZoneIds().stream().forEach(System.out::println);
     }
@@ -43,23 +47,33 @@ public class TimeConversion {
 ////
 ////    }
 
-    public static ZonedDateTime convertUTCToLocal(ZonedDateTime dateUTC) {
+    public static ZonedDateTime utcToLocal(ZonedDateTime dateUTC) {
         ZoneId localZoneId = ZoneId.of(TimeZone.getDefault().getID());
 //        ZonedDateTime utcToLocal = dateUTC.toInstant().atZone(localZoneId);
         ZonedDateTime utcToLocal = dateUTC.toInstant().atZone(localZoneId);
         return utcToLocal;
     }
 
-    public static ZonedDateTime convertLocalToUTC(ZonedDateTime dateLocal) {
+    public static ZonedDateTime localToUTC(ZonedDateTime dateLocal) {
         ZoneId utcZoneId = ZoneId.of("UTC");
         ZonedDateTime localToUTC = dateLocal.toInstant().atZone(utcZoneId);
         return localToUTC;
     }
 
-    public static ZonedDateTime convertUTCToEST(ZonedDateTime dateUTC) {
+    public static ZonedDateTime utcToEST(ZonedDateTime dateUTC) {
         ZoneId estZoneId = ZoneId.of("America/New_York");
         ZonedDateTime utcToEST = dateUTC.toInstant().atZone(estZoneId);
         return utcToEST;
+    }
+
+    public static ZonedDateTime stringToZDT(String dateTimeString) {
+        LocalDateTime ldt = LocalDateTime.parse(formatter.format(LocalDateTime.now()), formatter);
+        return ldt.atZone(ZoneId.systemDefault());
+    }
+
+    public static String currDateTimeAsString() {
+        LocalDateTime currDT = LocalDateTime.now();
+        return currDT.format(formatter);
     }
 
 }

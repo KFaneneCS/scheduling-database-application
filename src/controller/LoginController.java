@@ -1,8 +1,8 @@
 package controller;
 
-import helper.AlertPopups;
-import helper.Query;
-import helper.ScreenChanger;
+import utility.AlertPopups;
+import utility.Query;
+import utility.SceneChanger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -22,7 +22,7 @@ import static translation.Translation.translate;
 
 public class LoginController implements Initializable {
 
-    ScreenChanger screenChanger = new ScreenChanger();
+    SceneChanger screenChanger = new SceneChanger();
     @FXML
     private Button loginButton;
     @FXML
