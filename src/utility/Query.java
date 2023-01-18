@@ -2,6 +2,7 @@ package utility;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import model.CustomerAccess;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,6 +13,8 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 public abstract class Query {
+
+    private static final String GENERAL_ERROR_MESSAGE = "Sorry, there was an error.";
 
     public static int convertToUserId(String username) throws SQLException {
         String sql = "SELECT * FROM users WHERE User_Name = ?";
@@ -52,25 +55,56 @@ public abstract class Query {
 
     // Updaters
     // TODO:  Current task
-    public static int insertCustomer(String name, String address, String postalCode,
-                                     String phone, int divId) throws SQLException {
+    public static int insertCustomer(String n, String a, String pc,
+                                     String ph, int d) throws SQLException {
         try {
             String sql = "INSERT INTO customers (Customer_Name, Address, Postal_Code, Phone, " +
                     "Create_Date, Created_By, Last_Update, Last_Updated_By, Division_ID) " +
                     "VALUES (?, ?, ?, ?, NOW(), 'script', NOW(), 'script', ?)";
             PreparedStatement ps = JDBC.connection.prepareStatement(sql);
-            ps.setString(1, name);
-            ps.setString(2, address);
-            ps.setString(3, postalCode);
-            ps.setString(4, phone);
-            ps.setInt(5, divId);
+            ps.setString(1, n);
+            ps.setString(2, a);
+            ps.setString(3, pc);
+            ps.setString(4, ph);
+            ps.setInt(5, d);
             return ps.executeUpdate();
         } catch (Exception e) {
-            AlertPopups.generateErrorMessage("Sorry, there was an error");
+            AlertPopups.generateErrorMessage(GENERAL_ERROR_MESSAGE);
             e.printStackTrace();
             return -1;
         }
     }
+
+    public static void doEverything(String name, String address, String postalCode,
+                                    String phone, int divId) throws SQLException {
+
+        if (insertCustomer(name, address, postalCode, phone, divId) < 1) {
+            AlertPopups.generateErrorMessage(GENERAL_ERROR_MESSAGE);
+        }
+        else {
+            ResultSet rs = selectCustomer(name, address);
+
+            while (rs.next()) {
+                CustomerAccess.addCustomer(rs);
+            }
+        }
+
+    }
+
+    public static int convertToCustomerId(String customerName, String customerAddress) throws SQLException {
+        String sql = "SELECT * FROM customers WHERE Customer_Name = ? AND Address = ?";
+        PreparedStatement ps = JDBC.connection.prepareStatement(sql);
+        ps.setString(1, customerName);
+        ps.setString(2, customerAddress);
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            return rs.getInt("Customer_ID");
+        }
+        return 0;   // TODO:  Account for 0 in calls
+    }
+
+
 
     public static int update(int customerId, String customerName) throws SQLException {
         String sql = "UPDATE test_table SET customer = ? WHERE id = ?";
@@ -148,6 +182,38 @@ public abstract class Query {
         return JDBC.connection.createStatement().executeQuery(sql);
     }
 
+//    public static ResultSet selectCustomer(String name, String address) throws SQLException {
+//        String sql = "SELECT * FROM client_schedule.customers WHERE Customer_ID = ?";
+//        int id = convertToCustomerId(name, address);
+//        System.out.println("TEST:  id returned from conversion call = " + id);
+//        PreparedStatement ps = JDBC.connection.prepareStatement(sql);
+//        ps.setInt(1, id);
+//        return ps.executeQuery();
+//    }
 
+    public static ResultSet selectCustomer(String name, String address) throws SQLException {
+
+        String sql = "SELECT * FROM client_schedule.customers WHERE Customer_Name = ? AND Address = ?";
+        PreparedStatement ps = JDBC.connection.prepareStatement(sql);
+        ps.setString(1, name);
+        ps.setString(2, address);
+        return ps.executeQuery();
+    }
+
+    public static ResultSet selectCustomer(int id) throws SQLException {
+
+        String sql = "SELECT * FROM client_schedule.customers WHERE Customer_ID = ?";
+        PreparedStatement ps = JDBC.connection.prepareStatement(sql);
+        ps.setInt(1, id);
+        return ps.executeQuery();
+    }
+
+    public static ResultSet selectCustomer(String name) throws SQLException {
+
+        String sql = "SELECT * FROM client_schedule.customers WHERE Customer_Name = ?";
+        PreparedStatement ps = JDBC.connection.prepareStatement(sql);
+        ps.setString(1, name);
+        return ps.executeQuery();
+    }
 
 }
