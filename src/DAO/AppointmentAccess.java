@@ -23,7 +23,7 @@ public class AppointmentAccess {
         return filteredAppointments;
     }
 
-    public static void initializeAppointments() throws SQLException {
+    public static void initializeAppointments() {
 
         try {
             ResultSet rs = AppointmentQueries.selectAllAppointments();
@@ -36,6 +36,7 @@ public class AppointmentAccess {
             AlertPopups.generateErrorMessage(ERROR_MESSAGE);
             e.printStackTrace();
         }
+        System.out.println("TEST2:  Appointment size = " + getAllAppointments().size());
     }
 
     public static void addAppointment(Appointment appointment) {
@@ -136,7 +137,9 @@ public class AppointmentAccess {
             AlertPopups.generateErrorMessage(ERROR_MESSAGE);
         }
         else {
+            AlertPopups.generateCancelConfirmationMessage(apptToDelete.getId(), apptToDelete.getType());
             deleteAppointment(apptToDelete);
+            System.out.println("TEST:  I'm here!");
         }
     }
 

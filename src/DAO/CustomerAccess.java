@@ -45,6 +45,7 @@ public class CustomerAccess {
         }
 
         if (CustomerQueries.deleteCustomer(customer.getId()) == 1) {
+            AlertPopups.generateDeleteConfirmationMessage(customer.getId(), customer.getName());
             return true;
         }
 

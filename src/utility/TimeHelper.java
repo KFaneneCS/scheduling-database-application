@@ -4,6 +4,7 @@ import DAO.AppointmentAccess;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.Appointment;
+import model.User;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -15,6 +16,15 @@ public class TimeHelper {
     private static final ObservableList<Integer> hoursList = FXCollections.observableArrayList();
     private static final ObservableList<String> minutesList =
             FXCollections.observableArrayList("00", "15", "30", "45");
+
+
+    public static ObservableList<Integer> getHoursList() {
+        return hoursList;
+    }
+
+    public static ObservableList<String> getMinutesList() {
+        return minutesList;
+    }
 
 
     public static ZonedDateTime utcToLocal(ZonedDateTime dateUTC) {
@@ -47,10 +57,11 @@ public class TimeHelper {
 //        LocalDateTime ldt = LocalDateTime.parse(dbDateTimeString, STANDARD_FORMATTER);
 //        return ldt.atZone(ZoneId.systemDefault());
         LocalDateTime ldt = LocalDateTime.parse(dbDateTimeString, STANDARD_FORMATTER);
-        return ZonedDateTime.of(ldt, ZoneId.systemDefault());
+        return utcToLocal(ldt.atZone(ZoneId.of("UTC")));
     }
 
     public static String zdtToString(ZonedDateTime zdt) {
+        zdt = localToUTC(zdt);
         return zdt.format(STANDARD_FORMATTER);
     }
 
@@ -76,22 +87,35 @@ public class TimeHelper {
         }
     }
 
-    public static ObservableList<Integer> getHoursList() {
-        return hoursList;
-    }
-
-    public static ObservableList<String> getMinutesList() {
-        return minutesList;
-    }
-
     public static ZonedDateTime userInputToZDT(LocalDate localDate, int hour, String minuteString) {
 
         int minute = Integer.parseInt(minuteString);
         LocalTime localTime = LocalTime.of(hour, minute);
         LocalDateTime localDateTime = LocalDateTime.of(localDate, localTime);
-        ZoneId localZoneId = ZoneId.of(TimeZone.getDefault().getID());
+        ZoneId localZoneId = ZoneId.of("UTC");
         return ZonedDateTime.of(localDateTime, localZoneId);
     }
+
+
+    public static Appointment checkUpcomingAppointment(User user) {
+
+        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime offset = ZonedDateTime.now().plusMinutes(15);
+
+        for (Appointment appointment : AppointmentAccess.getAllAppointments()) {
+
+            if (appointment.getUserId() == user.getId()) {
+
+                ZonedDateTime start = appointment.getStart();
+
+                if ((start.isAfter(now) || start.isEqual(now)) && (start.isBefore(offset) || start.isEqual(offset))) {
+                    return appointment;
+                }
+            }
+        }
+        return null;
+    }
+
 
     public static boolean addHasOverlap(int customerId, ZonedDateTime checkStart, ZonedDateTime checkEnd) {
 

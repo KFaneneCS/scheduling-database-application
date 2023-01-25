@@ -1,14 +1,14 @@
 package controller;
 
+import DAO.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import model.Appointment;
 import model.User;
-import DAO.UserAccess;
-import DAO.UserQueries;
 import utility.AlertPopups;
 import utility.SceneChanger;
 import utility.TimeHelper;
@@ -56,7 +56,18 @@ public class LoginController implements Initializable {
 
                 try {
                     if (Objects.equals(loginPassword, user.getPassword())) {
+
+                        System.out.println("TEST:  User is = " + user.getId());
+                        try {
+                            TimeHelper.checkUpcomingAppointment(user);
+                            Appointment assocAppt = TimeHelper.checkUpcomingAppointment(user);
+                            System.out.println("Associated appointment = " + assocAppt.getTitle());
+                            AlertPopups.generateUpcomingApptMessage(assocAppt);
+                        } catch (NullPointerException npe) {
+                            AlertPopups.generateUpcomingApptMessage(null);
+                        }
                         screenChanger.changeScreen(event, "Welcome");
+
                     } else {
                         AlertPopups.generateErrorMessage(CREDENTIALS_ERROR);
                     }
@@ -84,8 +95,14 @@ public class LoginController implements Initializable {
         loginButton.setText(translate(loginButton.getText()));
 
         try {
+            ContactAccess.initializeContacts();
+            CountryAccess.initializeCountries();
+            FLDAccess.initializeFLDs();
+            AppointmentAccess.initializeAppointments();
+            CustomerAccess.initializeCustomers();
             UserAccess.initializeUsers();
             TimeHelper.setHoursList();
+
         } catch (Exception e) {
             AlertPopups.generateErrorMessage(ERROR_MESSAGE);
             e.printStackTrace();

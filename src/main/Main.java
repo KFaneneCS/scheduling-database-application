@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 import utility.JDBC;
 
 import java.sql.SQLException;
+import java.util.Locale;
 import java.util.Objects;
 
 public class Main extends Application {
@@ -93,8 +94,8 @@ public class Main extends Application {
 //        TimeHelper.convertLocalToUTC();
 
         // Change local to French for testing
-//        Locale.setDefault(new Locale("fr", "FR"));
-//
+        Locale.setDefault(new Locale("fr", "FR"));
+
 //        Locale userLocale = Locale.getDefault();
 
 //        if (userLocale.getLanguage().equalsIgnoreCase("fr")) {

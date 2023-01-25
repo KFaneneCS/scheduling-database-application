@@ -1,6 +1,5 @@
 package controller;
 
-import DAO.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -10,10 +9,8 @@ import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import utility.AlertPopups;
 import utility.SceneChanger;
-import utility.TimeHelper;
 
 import java.net.URL;
-import java.time.*;
 import java.util.ResourceBundle;
 
 public class WelcomeController implements Initializable{
@@ -67,27 +64,6 @@ public class WelcomeController implements Initializable{
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         System.out.println("~WelcomeController initialized");
-
-        try {
-            ContactAccess.initializeContacts();
-            CountryAccess.initializeCountries();
-            FLDAccess.initializeFLDs();
-            AppointmentAccess.initializeAppointments();
-            CustomerAccess.initializeCustomers();
-
-            LocalDateTime start = LocalDateTime.of(LocalDate.now(), LocalTime.of(10, 0));
-            LocalDateTime end = LocalDateTime.of(LocalDate.now(), LocalTime.of(11, 30));
-            ZonedDateTime startZDT = ZonedDateTime.of(start, ZoneId.systemDefault());
-            ZonedDateTime endZDT = ZonedDateTime.of(end, ZoneId.systemDefault());
-
-            TimeHelper.addHasOverlap(75, startZDT, endZDT);
-
-
-
-        } catch (Exception e) {
-            AlertPopups.generateErrorMessage(GENERAL_ERROR_MESSAGE);
-            e.printStackTrace();
-        }
 
     }
 
