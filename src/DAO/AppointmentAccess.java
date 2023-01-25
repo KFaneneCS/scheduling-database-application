@@ -1,0 +1,125 @@
+package DAO;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import model.Appointment;
+import utility.AlertPopups;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.ZonedDateTime;
+
+public class AppointmentAccess {
+
+    private static final String ERROR_MESSAGE = "Sorry, there was an error.";
+    public static final ObservableList<Appointment> allAppointments = FXCollections.observableArrayList();
+
+    public static ObservableList<Appointment> getAllAppointments() {
+        return allAppointments;
+    }
+
+    public static void initializeAppointments() throws SQLException {
+
+        try {
+            ResultSet rs = AppointmentQueries.selectAllAppointments();
+
+            while (rs.next()) {
+                Appointment appointment = getApptObjFromDB(rs);
+                addAppointment(appointment);
+            }
+        } catch (Exception e) {
+            AlertPopups.generateErrorMessage(ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+
+    public static void addAppointment(Appointment appointment) {
+        allAppointments.add(appointment);
+    }
+
+    public static boolean deleteAppointment(Appointment appointment) {
+        return allAppointments.remove(appointment);
+    }
+
+    public static Appointment getApptObjFromDB(ResultSet rs) throws SQLException {
+
+        int id = rs.getInt("Appointment_ID");
+        String title = rs.getString("Title");
+        String description = rs.getString("Description");
+        String location = rs.getString("Location");
+        String type = rs.getString("Type");
+        String start = rs.getString("Start");
+        String end = rs.getString("End");
+        String createDate = rs.getString("Create_Date");
+        String createdBy = rs.getString("Created_By");
+        String lastUpdate = rs.getString("Last_Update");
+        String lastUpdatedBy = rs.getString("Last_Updated_By");
+        int customerId = rs.getInt("Customer_ID");
+        int userId = rs.getInt("User_ID");
+        int contactId = rs.getInt("Contact_ID");
+        return new Appointment(id, title, description, location, type, start, end, createDate, createdBy, lastUpdate,
+                lastUpdatedBy, customerId, userId, contactId);
+    }
+
+    public static void updateAppointment(int id, Appointment updatedAppointment) {
+
+        int index = lookupIndex(id);
+        allAppointments.set(index, updatedAppointment);
+    }
+
+    public static int lookupIndex(int appointmentId) {
+
+        for (Appointment appointment : getAllAppointments()) {
+
+            if (appointment.getId() == appointmentId) {
+                return getAllAppointments().indexOf(appointment);
+            }
+        }
+        AlertPopups.generateErrorMessage(ERROR_MESSAGE);
+        return -1;
+    }
+
+    public static Appointment lookupAppointment(int appointmentId) {
+
+        for (Appointment appointment : getAllAppointments()) {
+
+            if (appointment.getId() == appointmentId) {
+                return appointment;
+            }
+        }
+        return null;
+    }
+
+    public static void executeAdd(String title, String description, String location, int contactId,
+                                  String type, ZonedDateTime startZDT, ZonedDateTime endZDT, int customerId,
+                                  int userId) throws SQLException {
+
+        if (AppointmentQueries.insertAppointment(title, description, location, type, startZDT, endZDT,
+                customerId, userId, contactId) < 1) {
+            AlertPopups.generateErrorMessage(ERROR_MESSAGE);
+        } else {
+            ResultSet rs = AppointmentQueries.selectAppointment(title, description, startZDT);
+
+            while (rs.next()) {
+                Appointment appointment = getApptObjFromDB(rs);
+                addAppointment(appointment);
+            }
+        }
+    }
+
+    public static void executeDelete(int appointmentId) throws SQLException {
+
+        Appointment apptToDelete = lookupAppointment(appointmentId);
+
+        if (apptToDelete == null) {
+            AlertPopups.generateErrorMessage(ERROR_MESSAGE);
+        }
+        else if (AppointmentQueries.deleteAppointment(appointmentId) < 1) {
+            AlertPopups.generateErrorMessage(ERROR_MESSAGE);
+        }
+        else {
+            deleteAppointment(apptToDelete);
+        }
+    }
+
+}

@@ -1,8 +1,11 @@
 package model;
 
-import utility.TimeConversion;
+import DAO.CountryAccess;
+import DAO.FLDAccess;
+import utility.TimeHelper;
 
 import java.time.ZonedDateTime;
+import java.util.Objects;
 
 public class Customer {
 
@@ -16,18 +19,23 @@ public class Customer {
     private ZonedDateTime lastUpdate;
     private String lastUpdatedBy;
     private int divisionId;
+    private String country;
+    private String firstLevelDiv;
 
-    public Customer(int id, String name, String address, String postalCode, String phone, String createDate, String createdBy, String lastUpdate, String lastUpdatedBy, int divisionId) {
+    public Customer(int id, String name, String address, String postalCode, String phone, String createDate,
+                    String createdBy, String lastUpdate, String lastUpdatedBy, int divisionId) {
         this.id = id;
         this.name = name;
         this.address = address;
         this.postalCode = postalCode;
         this.phone = phone;
-        this.createDate = TimeConversion.stringToZDT(createDate);
+        this.createDate = TimeHelper.stringToZDT(createDate);
         this.createdBy = createdBy;
-        this.lastUpdate = TimeConversion.stringToZDT(lastUpdate);
+        this.lastUpdate = TimeHelper.stringToZDT(lastUpdate);
         this.lastUpdatedBy = lastUpdatedBy;
         this.divisionId = divisionId;
+        this.country = Objects.requireNonNull(CountryAccess.lookupCountry(FLDAccess.getCountryId(divisionId))).getName();
+        this.firstLevelDiv = Objects.requireNonNull(FLDAccess.lookupFLD(divisionId)).getDivision();
     }
 
     public int getId() {
@@ -74,8 +82,8 @@ public class Customer {
         return createDate;
     }
 
-    public void setCreateDate(ZonedDateTime createDate) {
-        this.createDate = createDate;
+    public void setCreateDate(String createDate) {
+        this.createDate = TimeHelper.stringToZDT(createDate);
     }
 
     public String getCreatedBy() {
@@ -90,8 +98,8 @@ public class Customer {
         return lastUpdate;
     }
 
-    public void setLastUpdate(ZonedDateTime lastUpdate) {
-        this.lastUpdate = lastUpdate;
+    public void setLastUpdate(String lastUpdate) {
+        this.lastUpdate = TimeHelper.stringToZDT(lastUpdate);
     }
 
     public String getLastUpdatedBy() {
@@ -108,5 +116,21 @@ public class Customer {
 
     public void setDivisionId(int divisionId) {
         this.divisionId = divisionId;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(int divisionId) {
+        this.country = Objects.requireNonNull(CountryAccess.lookupCountry(FLDAccess.getCountryId(divisionId))).getName();
+    }
+
+    public String getFirstLevelDiv() {
+        return firstLevelDiv;
+    }
+
+    public void setFirstLevelDiv(int divisionId) {
+        this.firstLevelDiv = Objects.requireNonNull(FLDAccess.lookupFLD(divisionId)).getDivision();
     }
 }

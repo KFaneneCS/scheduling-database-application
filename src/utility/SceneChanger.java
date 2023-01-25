@@ -15,10 +15,10 @@ public class SceneChanger {
     Stage stage;
 
 
-    public void changeScreen(ActionEvent event, String desiredViewFileName) throws IOException {
+    public void changeScreen(ActionEvent event, String nextViewFileName) throws IOException {
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("/view/" + desiredViewFileName + ".fxml"));
+            loader.setLocation(getClass().getResource("/view/" + nextViewFileName + ".fxml"));
             loader.load();
 
             stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
@@ -29,8 +29,8 @@ public class SceneChanger {
 //            Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
 //            stage.setX((primScreenBounds.getWidth() - stage.getWidth()) / 2);
 //            stage.setY((primScreenBounds.getHeight() - stage.getHeight()) / 2);
-        } catch (IOException e) {
-            AlertPopups.generateErrorMessage(ERROR_MESSAGE);  // FIXME
+        } catch (Exception e) {
+            AlertPopups.generateErrorMessage(e.getMessage());  // FIXME
             e.printStackTrace();
         }
     }

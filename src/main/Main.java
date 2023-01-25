@@ -43,17 +43,17 @@ public class Main extends Application {
 //        // Testing query to get date, then various conversions
 //        ZonedDateTime appointmentDate = Query.getAppointmentDate(1);
 //        System.out.println("Appointment Date fetched from database: " + appointmentDate);
-//        ZonedDateTime appointmentDateToLocal = TimeConversion.convertUTCToLocal(appointmentDate);
+//        ZonedDateTime appointmentDateToLocal = TimeHelper.convertUTCToLocal(appointmentDate);
 //        System.out.println("Converted to Local: " + appointmentDateToLocal);
-//        ZonedDateTime appointmentDateBackToUTC = TimeConversion.convertLocalToUTC(appointmentDateToLocal);
+//        ZonedDateTime appointmentDateBackToUTC = TimeHelper.convertLocalToUTC(appointmentDateToLocal);
 //        System.out.println("Converted BACK to UTC: " + appointmentDateBackToUTC);
-//        ZonedDateTime appointmentDateToEST = TimeConversion.convertUTCToEST(appointmentDateBackToUTC);
+//        ZonedDateTime appointmentDateToEST = TimeHelper.convertUTCToEST(appointmentDateBackToUTC);
 //        System.out.println("Converted UTC to Eastern: " + appointmentDateToEST);
 
 //        System.out.println(LocalDateTime.parse(appointmentDate));
 
-//        TimeConversion.displayZoneIds();
-//        TimeConversion.displayZoneIds("Europe");
+//        TimeHelper.displayZoneIds();
+//        TimeHelper.displayZoneIds("Europe");
 
         // .of() used to explicitly create a ZonedDateTime object
 /*        LocalDate parisDate = LocalDate.of(2022, 12, 13);
@@ -90,7 +90,7 @@ public class Main extends Application {
         System.out.println("AFTER: " + formattedParisDateTime);*/
 
 
-//        TimeConversion.convertLocalToUTC();
+//        TimeHelper.convertLocalToUTC();
 
         // Change local to French for testing
 //        Locale.setDefault(new Locale("fr", "FR"));

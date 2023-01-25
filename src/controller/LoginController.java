@@ -1,14 +1,17 @@
 package controller;
 
-import utility.AlertPopups;
-import utility.Query;
-import utility.SceneChanger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import model.User;
+import DAO.UserAccess;
+import DAO.UserQueries;
+import utility.AlertPopups;
+import utility.SceneChanger;
+import utility.TimeHelper;
 
 import java.io.IOException;
 import java.net.URL;
@@ -22,6 +25,8 @@ import static translation.Translation.translate;
 
 public class LoginController implements Initializable {
 
+    String ERROR_MESSAGE = "Error";
+    String CREDENTIALS_ERROR = "invalid_credentials";
     SceneChanger screenChanger = new SceneChanger();
     @FXML
     private Button loginButton;
@@ -37,32 +42,32 @@ public class LoginController implements Initializable {
     private TextField usernameTextField;
 
     @FXML
-    void onActionLogin(ActionEvent event) {
+    void onActionLogin(ActionEvent event) throws SQLException {
         System.out.println("~Login button clicked");
 
-        String username = usernameTextField.getText();
+        String loginUsername = usernameTextField.getText();
         try {
-            int userId = Query.convertToUserId(username);
-            if (userId < 1) {
-                AlertPopups.generateErrorMessage("invalid_username");
-            }
-            else {
-                String providedPassword = passwordTextField.getText();
-                if (Objects.equals(Query.checkPassword(userId), providedPassword)) {
-                    // Login successful, go to Records screen
-                    try {
-                        screenChanger.changeScreen(event, "Welcome");
-                    } catch (IOException e) {
-                        AlertPopups.generateErrorMessage(e.getMessage());  // FIXME
-                    }
-                }
-                else {
-                    AlertPopups.generateErrorMessage("invalid_password");
-                }
-            }
+            int userId = UserQueries.convertToUserId(loginUsername);
+            User user = UserAccess.lookupUser(userId);
+            if (user == null) {
+                AlertPopups.generateErrorMessage(CREDENTIALS_ERROR);
+            } else {
+                String loginPassword = passwordTextField.getText();
 
-        } catch (SQLException e) {
-            AlertPopups.generateErrorMessage(e.getMessage());
+                try {
+                    if (Objects.equals(loginPassword, user.getPassword())) {
+                        screenChanger.changeScreen(event, "Welcome");
+                    } else {
+                        AlertPopups.generateErrorMessage(CREDENTIALS_ERROR);
+                    }
+                } catch (IOException ioe) {
+                    AlertPopups.generateErrorMessage(ERROR_MESSAGE);
+                    ioe.printStackTrace();
+                }
+            }
+        } catch (Exception e) {
+            AlertPopups.generateErrorMessage(ERROR_MESSAGE);
+            e.printStackTrace();
         }
     }
 
@@ -77,5 +82,13 @@ public class LoginController implements Initializable {
         usernameTextField.setPromptText(translate(usernameTextField.getPromptText()));
         passwordTextField.setPromptText(translate(passwordTextField.getPromptText()));
         loginButton.setText(translate(loginButton.getText()));
+
+        try {
+            UserAccess.initializeUsers();
+            TimeHelper.setHoursList();
+        } catch (Exception e) {
+            AlertPopups.generateErrorMessage(ERROR_MESSAGE);
+            e.printStackTrace();
+        }
     }
 }

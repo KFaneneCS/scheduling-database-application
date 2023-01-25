@@ -1,20 +1,26 @@
 package controller;
 
-import utility.AlertPopups;
-import utility.SceneChanger;
+import DAO.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.stage.Stage;
+import utility.AlertPopups;
+import utility.SceneChanger;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class WelcomeController implements Initializable{
 
-    SceneChanger screenChanger = new SceneChanger();
+    SceneChanger sceneChanger = new SceneChanger();
+    String EXIT_CONFIRMATION = "Are you sure you want to quit?";
+    String GENERAL_ERROR_MESSAGE = "Sorry, there was an error.";
+    Stage stage;
+    Parent scene;
     @FXML
     private Button appointmentsButton;
 
@@ -32,13 +38,17 @@ public class WelcomeController implements Initializable{
 
     @FXML
     void onActionDisplayAppointmentRecords(ActionEvent event) {
-        System.out.println("~Appointment button clicked");
+        try {
+            sceneChanger.changeScreen(event, "Appointment");
+        } catch (Exception e) {
+            AlertPopups.generateErrorMessage(e.getMessage());
+        }
     }
 
     @FXML
-    void onActionDisplayCustomerRecords(ActionEvent event) throws IOException {
+    void onActionDisplayCustomerRecords(ActionEvent event) {
         try {
-            screenChanger.changeScreen(event, "Customers");
+            sceneChanger.changeScreen(event, "Customer");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -46,7 +56,7 @@ public class WelcomeController implements Initializable{
 
     @FXML
     void onActionExitProgram(ActionEvent event) {
-        if (AlertPopups.receiveConfirmation("Exit","Are you sure?")) {
+        if (AlertPopups.receiveConfirmation("Exit",EXIT_CONFIRMATION)) {
             System.exit(0);
         }
     }
@@ -55,6 +65,18 @@ public class WelcomeController implements Initializable{
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         System.out.println("~WelcomeController initialized");
+
+        try {
+            ContactAccess.initializeContacts();
+            CountryAccess.initializeCountries();
+            FLDAccess.initializeFLDs();
+            AppointmentAccess.initializeAppointments();
+            CustomerAccess.initializeCustomers();
+        } catch (Exception e) {
+            AlertPopups.generateErrorMessage(GENERAL_ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+
     }
 
 }

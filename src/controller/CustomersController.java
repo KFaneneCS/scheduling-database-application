@@ -1,5 +1,6 @@
 package controller;
 
+import DAO.*;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -9,10 +10,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.util.Callback;
-import model.Customer;
-import model.CustomerAccess;
+import model.*;
 import utility.AlertPopups;
-import utility.Query;
 import utility.SceneChanger;
 
 import java.io.IOException;
@@ -23,13 +22,16 @@ import java.util.ResourceBundle;
 
 public class CustomersController implements Initializable {
 
-    String GENERAL_ERROR_MESSAGE = "Sorry, there was an error.";
-    String EMPTY_ERROR_MESSAGE = "Sorry, all fields must be filled in.";
-    String NO_RESULTS_ERROR_MESSAGE = "Sorry, could not find any results.";
-    private ObservableList<ObservableList> data = FXCollections.observableArrayList();
     private final ObservableList<String> countriesList = FXCollections
             .observableArrayList("U.S", "UK", "Canada");
     SceneChanger screenChanger = new SceneChanger();
+    String GENERAL_ERROR_MESSAGE = "Sorry, there was an error.";
+    String EMPTY_ERROR_MESSAGE = "Sorry, all fields must be filled in.";
+    String NO_RESULTS_ERROR_MESSAGE = "Sorry, could not find any results.";
+    String SELECTION_ERROR_MESSAGE = "No customer was selected.";
+    String CHANGE_CONFIRMATION = "Confirm changes?";
+    String DELETE_CONFIRMATION = "Are you sure you wish to delete customer, including ALL associated appointments?";
+    boolean customerSelected = false;
 
     @FXML
     private Button addButton;
@@ -42,6 +44,9 @@ public class CustomersController implements Initializable {
 
     @FXML
     private Button backButton;
+
+    @FXML
+    private Button clearButton;
 
     @FXML
     private ComboBox<String> countryComboBox;
@@ -83,6 +88,9 @@ public class CustomersController implements Initializable {
     private Label postalCodeLabel;
 
     @FXML
+    private Button selectButton;
+
+    @FXML
     private TextField postalCodeTextField;
 
     @FXML
@@ -98,7 +106,6 @@ public class CustomersController implements Initializable {
     @FXML
     void onActionAddCustomer(ActionEvent event) throws SQLException {
 
-        // TODO:  Current task
         String name = nameTextField.getText().strip();
         String address = addressTextField.getText().strip();
         String postalCode = postalCodeTextField.getText().strip();
@@ -109,13 +116,13 @@ public class CustomersController implements Initializable {
             return;
         }
 
-        int divisionId = Query.getDivisionId(stateProvinceComboBox.getValue());
+        int divisionId = FLDAccess.lookupFLDId(stateProvinceComboBox.getValue());
         if (divisionId < 1) {
             AlertPopups.generateErrorMessage(GENERAL_ERROR_MESSAGE);
             return;
         }
 
-        Query.doEverything(name, address, postalCode, phone, divisionId);
+        CustomerAccess.executeAdd(name, address, postalCode, phone, divisionId);
         fillCustomerTable();
 
 //        CustomerAccess.addCustomer(rs);
@@ -126,13 +133,79 @@ public class CustomersController implements Initializable {
     }
 
     @FXML
+    void onActionClearTextFields(ActionEvent event) {
+
+        idTextField.setText("auto-generated");
+        nameTextField.clear();
+        addressTextField.clear();
+        postalCodeTextField.clear();
+        phoneTextField.clear();
+        countryComboBox.setValue("U.S");
+        stateProvinceComboBox.setValue("Alabama");
+
+        addButton.setDisable(false);
+
+        customerSelected = false;
+    }
+
+    @FXML
     void onActionDeleteCustomer(ActionEvent event) {
-        System.out.println("~Delete customer button pressed");
+
+        // TODO:  Haven't tested this yet!!!
+        if (!customerSelected) {
+            AlertPopups.generateErrorMessage(SELECTION_ERROR_MESSAGE);
+        } else {
+
+            try {
+
+                if (AlertPopups.receiveConfirmation("Delete", DELETE_CONFIRMATION)) {
+
+                    int customerId = Integer.parseInt(idTextField.getText());
+                    CustomerAccess.executeDelete(CustomerAccess.lookupCustomers(customerId));
+                    fillCustomerTable();
+
+
+                }
+            } catch (Exception e) {
+                AlertPopups.generateErrorMessage(GENERAL_ERROR_MESSAGE);
+                e.printStackTrace();
+            }
+        }
     }
 
     @FXML
     void onActionDisplayWelcome(ActionEvent event) throws IOException {
         screenChanger.changeScreen(event, "Welcome");
+    }
+
+    @FXML
+    void onActionSelectCustomer(ActionEvent event) {
+
+        try {
+
+            ObservableList<Customer> customerList = customersTableView.getSelectionModel().getSelectedItem();
+            int customerIdForSearch = Integer.parseInt(String.valueOf(customerList.get(0)));
+            Customer customer = CustomerAccess.lookupCustomers(customerIdForSearch);
+
+            idTextField.setText(String.valueOf(customer.getId()));
+            nameTextField.setText(customer.getName());
+            addressTextField.setText(customer.getAddress());
+            postalCodeTextField.setText(customer.getPostalCode());
+            phoneTextField.setText(customer.getPhone());
+            countryComboBox.setValue(customer.getCountry());
+            stateProvinceComboBox.setValue(customer.getFirstLevelDiv());
+
+            System.out.println("TEST:  Customer start date using conversion === " + customer.getCreateDate());
+
+            addButton.setDisable(true);
+
+            customerSelected = true;
+
+        } catch (NullPointerException npe) {
+            AlertPopups.generateErrorMessage(SELECTION_ERROR_MESSAGE);
+        } catch (Exception e) {
+            AlertPopups.generateErrorMessage(GENERAL_ERROR_MESSAGE);
+        }
     }
 
     @FXML
@@ -147,8 +220,43 @@ public class CustomersController implements Initializable {
     }
 
     @FXML
-    void onActionUpdateCustomer(ActionEvent event) {
-        System.out.println("~Update customer button pressed");
+    void onActionUpdateCustomer(ActionEvent event) throws SQLException {
+
+        if (!customerSelected) {
+            AlertPopups.generateErrorMessage(SELECTION_ERROR_MESSAGE);
+        } else {
+
+            int id = Integer.parseInt(idTextField.getText());
+            String name = nameTextField.getText().strip();
+            String address = addressTextField.getText().strip();
+            String postalCode = postalCodeTextField.getText().strip();
+            String phone = phoneTextField.getText().strip();
+
+            if (name.isEmpty() || address.isEmpty() || postalCode.isEmpty() || phone.isEmpty()) {
+                AlertPopups.generateErrorMessage(EMPTY_ERROR_MESSAGE);
+                return;
+            }
+
+            int divisionId = FLDAccess.lookupFLDId(stateProvinceComboBox.getValue());
+            if (divisionId < 1) {
+                AlertPopups.generateErrorMessage(GENERAL_ERROR_MESSAGE);
+                return;
+            }
+
+            if (AlertPopups.receiveConfirmation("Confirm Update", CHANGE_CONFIRMATION)) {
+                if (CustomerQueries.updateCustomer(id, name, address, postalCode, phone, divisionId) == 1) {
+                    fillCustomerTable();
+                    ResultSet rs = CustomerQueries.selectCustomer(id);
+                    while (rs.next()) {
+                        Customer updatedCustomer = CustomerAccess.getCustomerObjFromDB(rs);
+                        CustomerAccess.updateCustomer(id, updatedCustomer);
+                    }
+
+                } else {
+                    AlertPopups.generateErrorMessage(GENERAL_ERROR_MESSAGE);
+                }
+            }
+        }
     }
 
     public void fillCustomerTable() {
@@ -156,12 +264,11 @@ public class CustomersController implements Initializable {
         // checks whether table columns were already populated
         boolean populated = customersTableView.getColumns().size() > 0;
 
-        data.removeAll();
         customersTableView.getItems().clear();
 
         try {
 
-            ResultSet rs = Query.selectAllCustomers();
+            ResultSet rs = CustomerQueries.selectAllCustomers();
 
             if (!populated) {
                 for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
@@ -180,20 +287,17 @@ public class CustomersController implements Initializable {
                 }
             }
 
-            updateTable(rs);
+            refreshTable(rs);
 
         } catch (Exception e) {
             AlertPopups.generateErrorMessage(GENERAL_ERROR_MESSAGE);
             e.printStackTrace();
         }
-        System.out.println("# of rows after = " + customersTableView.getItems().size());
-        System.out.println("DATA size = " + data.size());
     }
 
+    public void refreshTable(ResultSet rs) throws SQLException {
 
-    public void updateTable(ResultSet rs) throws SQLException {
-
-        data.removeAll();
+        ObservableList<ObservableList> data = FXCollections.observableArrayList();
         customersTableView.getItems().clear();
 
         while (rs.next()) {
@@ -206,9 +310,9 @@ public class CustomersController implements Initializable {
         customersTableView.setItems(data);
     }
 
-    public void updateTable(ObservableList<ResultSet> rsList) throws SQLException {
+    public void refreshTable(ObservableList<ResultSet> rsList) throws SQLException {
 
-        data.removeAll();
+        ObservableList<ObservableList> data = FXCollections.observableArrayList();
         customersTableView.getItems().clear();
 
         for (ResultSet rs : rsList) {
@@ -225,8 +329,8 @@ public class CustomersController implements Initializable {
 
     public void fillStateProvinceComboBox() throws SQLException {
         String country = countryComboBox.getValue();
-        int countryId = Query.convertToCountryId(country);
-        ObservableList<String> fldList = Query.getFirstLevelDiv(countryId);
+        int countryId = CountryAccess.lookupCountryId(country);
+        ObservableList<String> fldList = FLDAccess.getFilteredFLDsAsStrings(countryId);
         stateProvinceComboBox.setItems(fldList);
         stateProvinceComboBox.setValue(fldList.get(0));
     }
@@ -234,29 +338,34 @@ public class CustomersController implements Initializable {
     public void filterTable(String text) throws SQLException {
         ObservableList<ResultSet> rsList = FXCollections.observableArrayList();
         try {
-            int id = Integer.parseInt(text);
-            Customer customer = CustomerAccess.lookupCustomer(id);
+            if (text.isBlank()) {
+                fillCustomerTable();
+                return;
+            }
+            int id = Integer.parseInt(text.strip());
+            Customer customer = CustomerAccess.lookupCustomers(id);
             if (customer == null) {
                 throw new NullPointerException();
             } else {
-                ResultSet rs = Query.selectCustomer(customer.getId());
-                updateTable(rs);
+                ResultSet rs = CustomerQueries.selectCustomer(customer.getId());
+                refreshTable(rs);
             }
         } catch (NumberFormatException numberFormatException) {
-            ObservableList<Customer> customersList = CustomerAccess.lookupCustomer(text);
+            ObservableList<Customer> customersList = CustomerAccess.lookupCustomers(text.strip());
             if (customersList.size() < 1) {
                 fillCustomerTable();
                 AlertPopups.generateErrorMessage(NO_RESULTS_ERROR_MESSAGE);
             } else {
                 for (Customer customer : customersList) {
-                    ResultSet rs = Query.selectCustomer(customer.getName());
+                    ResultSet rs = CustomerQueries.selectCustomer(customer.getName(), customer.getAddress());
                     rsList.add(rs);
                 }
-                updateTable(rsList);
+                refreshTable(rsList);
             }
         } catch (NullPointerException nullPointerException) {
             AlertPopups.generateErrorMessage(NO_RESULTS_ERROR_MESSAGE);
         }
+
     }
 
 
@@ -266,9 +375,9 @@ public class CustomersController implements Initializable {
         fillCustomerTable();
         countryComboBox.setValue("U.S");
         countryComboBox.setItems(countriesList);
+
         try {
             fillStateProvinceComboBox();
-            CustomerAccess.initializeCustomers();
         } catch (SQLException e) {
             AlertPopups.generateErrorMessage(GENERAL_ERROR_MESSAGE);
             e.printStackTrace();

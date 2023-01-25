@@ -162,10 +162,11 @@
                <children>
                   <GridPane prefHeight="42.0" prefWidth="800.0">
                     <columnConstraints>
-                      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="360.0" minWidth="10.0" prefWidth="177.0" />
-                      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="312.0" minWidth="10.0" prefWidth="178.0" />
-                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="301.0" minWidth="10.0" prefWidth="162.0" />
-                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="291.0" minWidth="10.0" prefWidth="279.0" />
+                      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="360.0" minWidth="10.0" prefWidth="130.0" />
+                      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="312.0" minWidth="10.0" prefWidth="130.0" />
+                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="301.0" minWidth="10.0" prefWidth="130.0" />
+                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="301.0" minWidth="10.0" prefWidth="130.0" />
+                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="291.0" minWidth="10.0" prefWidth="280.0" />
                     </columnConstraints>
                     <rowConstraints>
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -174,11 +175,10 @@
                         <Button fx:id="addButton" cache="true" mnemonicParsing="false" onAction="#onActionAddCustomer" prefHeight="30.0" prefWidth="100.0" style="-fx-background-radius: 10;" text="Add" />
                         <Button fx:id="updateButton" mnemonicParsing="false" onAction="#onActionUpdateCustomer" prefHeight="30.0" prefWidth="100.0" style="-fx-background-radius: 10;" text="Update" GridPane.columnIndex="1" />
                         <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#onActionDeleteCustomer" prefHeight="30.0" prefWidth="100.0" style="-fx-background-radius: 10;" text="Delete" GridPane.columnIndex="2" />
-                        <Button fx:id="backButton" alignment="CENTER" layoutX="523.0" layoutY="16.0" mnemonicParsing="false" onAction="#onActionDisplayWelcome" prefHeight="30.0" prefWidth="75.0" style="-fx-background-radius: 10;" text="Back" GridPane.columnIndex="3">
+                        <Button fx:id="clearButton" layoutX="316.0" layoutY="16.0" mnemonicParsing="false" onAction="#onActionClearTextFields" prefHeight="30.0" prefWidth="100.0" style="-fx-background-radius: 10;" text="Clear" GridPane.columnIndex="4">
                            <GridPane.margin>
-                              <Insets right="30.0" />
-                           </GridPane.margin>
-                        </Button>
+                              <Insets right="20.0" />
+                           </GridPane.margin></Button>
                      </children>
                   </GridPane>
                </children>
@@ -190,6 +190,11 @@
                         <Insets right="30.0" />
                      </HBox.margin>
                   </TextField>
+                  <Button fx:id="selectButton" alignment="CENTER" mnemonicParsing="false" onAction="#onActionSelectCustomer" prefHeight="20.0" prefWidth="75.0" style="-fx-background-radius: 10;" text="Select">
+                     <HBox.margin>
+                        <Insets right="30.0" />
+                     </HBox.margin>
+                  </Button>
                </children>
                <VBox.margin>
                   <Insets />
@@ -199,12 +204,19 @@
                <children>
                   <TableView fx:id="customersTableView" prefHeight="241.0" prefWidth="780.0">
                      <HBox.margin>
-                        <Insets bottom="15.0" left="15.0" right="15.0" top="5.0" />
+                        <Insets bottom="5.0" left="15.0" right="15.0" top="5.0" />
                      </HBox.margin>
                   </TableView>
                </children>
             </HBox>
-            <HBox prefHeight="100.0" prefWidth="200.0" />
+            <HBox alignment="TOP_RIGHT" prefHeight="63.0" prefWidth="800.0">
+               <children>
+                  <Button fx:id="backButton" alignment="CENTER" mnemonicParsing="false" onAction="#onActionDisplayWelcome" prefHeight="30.0" prefWidth="75.0" style="-fx-background-radius: 10;" text="Back">
+                     <HBox.margin>
+                        <Insets right="20.0" top="5.0" />
+                     </HBox.margin>
+                  </Button>
+               </children></HBox>
          </children>
       </VBox>
    </children>
