@@ -1,7 +1,9 @@
 package utility;
 
+import DAO.AppointmentAccess;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import model.Appointment;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -74,13 +76,13 @@ public class TimeHelper {
         }
     }
 
-        public static ObservableList<Integer> getHoursList() {
-            return hoursList;
-        }
+    public static ObservableList<Integer> getHoursList() {
+        return hoursList;
+    }
 
-        public static ObservableList<String> getMinutesList() {
-            return minutesList;
-        }
+    public static ObservableList<String> getMinutesList() {
+        return minutesList;
+    }
 
     public static ZonedDateTime userInputToZDT(LocalDate localDate, int hour, String minuteString) {
 
@@ -90,6 +92,73 @@ public class TimeHelper {
         ZoneId localZoneId = ZoneId.of(TimeZone.getDefault().getID());
         return ZonedDateTime.of(localDateTime, localZoneId);
     }
+
+    public static boolean addHasOverlap(int customerId, ZonedDateTime checkStart, ZonedDateTime checkEnd) {
+
+        for (Appointment appointment : AppointmentAccess.getAllAppointments()) {
+
+            if (appointment.getCustomerId() == customerId) {
+
+                ZonedDateTime start = appointment.getStart();
+                ZonedDateTime end = appointment.getEnd();
+
+                if (isOverlapping(checkStart, checkEnd, start, end)) {
+                    return true;
+                }
+            }
+        }
+        System.out.println("NO OVERLAP");
+        return false;
+    }
+
+    public static boolean updateHasOverlap(int customerId, int appointmentId, ZonedDateTime checkStart, ZonedDateTime checkEnd) {
+
+        for (Appointment appointment : AppointmentAccess.getAllAppointments()) {
+
+            if (appointment.getId() == appointmentId) {
+                break;
+            }
+
+            if (appointment.getCustomerId() == customerId) {
+
+                ZonedDateTime start = appointment.getStart();
+                ZonedDateTime end = appointment.getEnd();
+
+                if (isOverlapping(checkStart, checkEnd, start, end)) {
+                    return true;
+                };
+            }
+        }
+        System.out.println("NO OVERLAP");
+        return false;
+    }
+
+
+    public static boolean isOverlapping(ZonedDateTime checkS, ZonedDateTime checkE, ZonedDateTime start, ZonedDateTime end) {
+
+        // Check #1
+        if ((checkS.isAfter(start) || (checkS.isEqual(start))) && ((checkS.isBefore(end)))) {
+
+            System.out.println("Confirmed OVERLAP");
+            return true;
+        }
+
+        // Check #2
+        if ((checkE.isAfter(start)) && (checkE.isBefore(end) || checkE.isEqual(end))) {
+
+            System.out.println("Confirmed OVERLAP");
+            return true;
+        }
+
+        // Check #3
+        if ((checkS.isBefore(start) || checkS.isEqual(start)) && (checkE.isAfter(end) || checkE.isEqual(end))) {
+
+            System.out.println("Confirmed OVERLAP");
+            return true;
+        }
+        return false;
+    }
+}
 
 
 //        switch (choiceId) {
@@ -140,4 +209,4 @@ public class TimeHelper {
 ////
 ////    }
 
-    }
+

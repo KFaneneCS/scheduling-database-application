@@ -49,7 +49,7 @@ public class AppointmentQueries {
         return JDBC.connection.createStatement().executeQuery(sql);
     }
 
-    public static ResultSet selectAppointment(String title, String description, ZonedDateTime start) throws SQLException {
+    public static ResultSet selectAppointmentByTable(String title, String description, ZonedDateTime start) throws SQLException {
         String sql = "SELECT * FROM client_schedule.appointments WHERE Title = ? AND Description = ? AND Start = ?";
         PreparedStatement ps = JDBC.connection.prepareStatement(sql);
         ps.setString(1, title);
@@ -58,12 +58,41 @@ public class AppointmentQueries {
         return ps.executeQuery();
     }
 
-    public static ResultSet selectAppointment(int id) throws SQLException {
+    public static ResultSet selectAppointmentByTable(int id, int tableNum) throws SQLException {
 
-        String sql = "SELECT * FROM client_schedule.appointments WHERE Appointment_ID = ?";
-        PreparedStatement ps = JDBC.connection.prepareStatement(sql);
-        ps.setInt(1, id);
-        return ps.executeQuery();
+        String sql = "";
+        LocalDate initial = LocalDate.now();
+        String start;
+        String end;
+        PreparedStatement ps;
+        switch (tableNum) {
+            case 1:
+                sql = "SELECT * FROM client_schedule.appointments WHERE Appointment_ID = ?";
+                ps = JDBC.connection.prepareStatement(sql);
+                ps.setInt(1, id);
+                return ps.executeQuery();
+            case 2:
+                sql = "SELECT * FROM client_schedule.appointments WHERE (Appointment_ID = ?) AND (Start BETWEEN ? AND ?)";
+                start = initial.with(firstDayOfMonth()).toString();
+                end = initial.with(lastDayOfMonth()).atTime(23, 59).toString();
+                ps = JDBC.connection.prepareStatement(sql);
+                ps.setInt(1, id);
+                ps.setString(2, start);
+                ps.setString(3, end);
+                return ps.executeQuery();
+            case 3:
+                sql = "SELECT * FROM client_schedule.appointments WHERE (Appointment_ID = ?) AND (Start BETWEEN ? AND ?)";
+                start = initial.with(DayOfWeek.MONDAY).toString();
+                end = initial.with(DayOfWeek.SUNDAY).toString();
+                ps = JDBC.connection.prepareStatement(sql);
+                ps.setInt(1, id);
+                ps.setString(2, start);
+                ps.setString(3, end);
+                return ps.executeQuery();
+            default:
+                return null;
+        }
+
     }
 
     public static ResultSet selectCurrMonthAppointments() throws SQLException {

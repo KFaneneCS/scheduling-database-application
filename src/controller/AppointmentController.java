@@ -10,7 +10,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.util.Callback;
-import model.*;
+import model.Appointment;
+import model.Contact;
+import model.Customer;
+import model.User;
 import utility.AlertPopups;
 import utility.SceneChanger;
 import utility.TimeHelper;
@@ -32,6 +35,8 @@ public class AppointmentController implements Initializable {
     private static final String NO_RESULTS_ERROR_MESSAGE = "Sorry, could not find any results.";
     private static final String INVALID_TIMES_MESSAGE = "Sorry, appointment cannot end before start time.";
     private static final String SELECTION_ERROR_MESSAGE = "Sorry, no appointment was selected.";
+    private static final String OVERLAP_ERROR_MESSAGE =
+            "Sorry, the proposed timeframe overlaps with an existing appointment.";
     private static final String CHANGE_CONFIRMATION = "Confirm changes?";
     private static final String DELETE_CONFIRMATION = "Are you sure you want to delete this appointment?";
     boolean addListenerTriggered = false;
@@ -213,6 +218,11 @@ public class AppointmentController implements Initializable {
             int customerId = CustomerAccess.lookupCustomerId(customer);
             int userId = UserAccess.lookupUserId(user);
 
+            if (TimeHelper.addHasOverlap(customerId, startZDT, endZDT)) {
+                AlertPopups.generateErrorMessage(OVERLAP_ERROR_MESSAGE);
+                return;
+            }
+
             AppointmentAccess.executeAdd(title, description, location, contactId,
                     type, startZDT, endZDT, customerId, userId);
             fillAllAppointmentTables();
@@ -270,8 +280,9 @@ public class AppointmentController implements Initializable {
     }
 
     @FXML
-    void onActionFilterAppointments(ActionEvent event) {
-        // TODO
+    void onActionFilterAppointments(ActionEvent event) throws SQLException {
+        String searchText = appointmentFilterTextField.getText();
+        filterTable(searchText);
     }
 
     @FXML
@@ -324,7 +335,7 @@ public class AppointmentController implements Initializable {
             endDatePicker.setValue(appointment.getEnd().toLocalDate());
             endHourComboBox.setValue(appointment.getEnd().getHour());
             endMinuteComboBox.setValue(endMin);
-            customerNameComboBox.setValue(CustomerAccess.lookupCustomers(appointment.getCustomerId()).getName());
+            customerNameComboBox.setValue(CustomerAccess.lookupCustomer(appointment.getCustomerId()).getName());
             userNameComboBox.setValue(UserAccess.lookupUser(appointment.getUserId()).getName());
 
 
@@ -379,10 +390,15 @@ public class AppointmentController implements Initializable {
             int userId = UserAccess.lookupUserId(user);
             int contactId = ContactAccess.lookupContactId(contact);
 
+            if (TimeHelper.updateHasOverlap(customerId, id, startZDT, endZDT)) {
+                AlertPopups.generateErrorMessage(OVERLAP_ERROR_MESSAGE);
+                return;
+            }
+
             if (AlertPopups.receiveConfirmation("Confirm Update", CHANGE_CONFIRMATION)) {
                 if (AppointmentQueries.updateAppointment(id, title, description, location, type, startZDT, endZDT, customerId, userId, contactId) == 1) {
                     fillAllAppointmentTables();
-                    ResultSet rs = AppointmentQueries.selectAppointment(id);
+                    ResultSet rs = AppointmentQueries.selectAppointmentByTable(id, 1);
                     while (rs.next()) {
                         Appointment updatedAppointment = AppointmentAccess.getApptObjFromDB(rs);
                         AppointmentAccess.updateAppointment(id, updatedAppointment);
@@ -433,6 +449,7 @@ public class AppointmentController implements Initializable {
 
     public void refreshTable(TableView table, ResultSet rs) throws SQLException {
 
+
         ObservableList<ObservableList> data = FXCollections.observableArrayList();
         table.getItems().clear();
 
@@ -445,20 +462,24 @@ public class AppointmentController implements Initializable {
         }
 
         table.setItems(data);
+    }
 
-//        if (allAppointmentsTableView.equals(table)) {
-//            allDisplayed = true;
-//            monthDisplayed = false;
-//            weekDisplayed = false;
-//        } else if (currMonthTableView.equals(table)) {
-//            monthDisplayed = true;
-//            allDisplayed = false;
-//            weekDisplayed = false;
-//        } else if (currWeekTableView.equals(table)) {
-//            weekDisplayed = true;
-//            allDisplayed = false;
-//            monthDisplayed = false;
-//        }
+    public void refreshTable(TableView table, ObservableList<ResultSet> rsList) throws SQLException {
+
+        ObservableList<ObservableList> data = FXCollections.observableArrayList();
+        table.getItems().clear();
+
+        for (ResultSet rs : rsList) {
+            while (rs.next()) {
+                ObservableList<String> row = FXCollections.observableArrayList();
+                for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+                    row.add(rs.getString(i));
+                }
+                data.add(row);
+            }
+        }
+        table.setItems(data);
+
     }
 
     public void fillComboAndDates() throws SQLException {
@@ -520,6 +541,58 @@ public class AppointmentController implements Initializable {
             };
         }
     };
+
+    public void filterTable(String text) throws SQLException {
+
+        TableView tableView = null;
+        int tableNum = 0;
+        Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+
+        if (allTab.equals(selectedTab)) {
+            tableView = allAppointmentsTableView;
+            tableNum = 1;
+        } else if (currMonthTab.equals(selectedTab)) {
+            tableView = currMonthTableView;
+            tableNum = 2;
+        } else if (currWeekTab.equals(selectedTab)) {
+            tableView = currWeekTableView;
+            tableNum = 3;
+        } else {
+            System.out.println("TABLEVIEW IS NULL!");
+        }
+        ObservableList<ResultSet> rsList = FXCollections.observableArrayList();
+        try {
+
+            if (text.isBlank()) {
+                fillAllAppointmentTables();
+                return;
+            }
+            int id = Integer.parseInt(text.strip());
+            Appointment appointment = AppointmentAccess.lookupAppointment(id);
+            if (appointment == null) {
+                throw new NullPointerException();
+            } else {
+                ResultSet rs = AppointmentQueries.selectAppointmentByTable(appointment.getId(), tableNum);
+                refreshTable(tableView, rs);
+            }
+
+        } catch (NumberFormatException numberFormatException) {
+            ObservableList<Appointment> appointmentList = AppointmentAccess.lookupAppointments(text.strip());
+            if (appointmentList.size() < 1) {
+                fillAllAppointmentTables();
+                AlertPopups.generateErrorMessage(NO_RESULTS_ERROR_MESSAGE);
+            } else {
+                for (Appointment appointment : appointmentList) {
+                    ResultSet rs = AppointmentQueries.selectAppointmentByTable(appointment.getTitle(), appointment.getDescription(), appointment.getStart());
+                    rsList.add(rs);
+                }
+                refreshTable(tableView, rsList);
+            }
+
+        } catch (NullPointerException nullPointerException) {
+            AlertPopups.generateErrorMessage(NO_RESULTS_ERROR_MESSAGE);
+        }
+    }
 
     public void fillAllAppointmentTables() throws SQLException {
 

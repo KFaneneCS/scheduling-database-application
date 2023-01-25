@@ -270,7 +270,7 @@
             </HBox>
             <HBox alignment="BOTTOM_RIGHT" layoutX="10.0" layoutY="283.0" prefHeight="33.0" prefWidth="800.0">
                <children>
-                  <TextField fx:id="appointmentFilterTextField" onAction="#onActionFilterAppointments" prefHeight="25.0" prefWidth="211.0" promptText="Search by Customer ID or Name">
+                  <TextField fx:id="appointmentFilterTextField" onAction="#onActionFilterAppointments" prefHeight="25.0" prefWidth="211.0" promptText="Search by Appointment ID or Title">
                      <HBox.margin>
                         <Insets right="30.0" />
                      </HBox.margin>

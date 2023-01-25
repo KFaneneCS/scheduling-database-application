@@ -10,8 +10,10 @@ import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import utility.AlertPopups;
 import utility.SceneChanger;
+import utility.TimeHelper;
 
 import java.net.URL;
+import java.time.*;
 import java.util.ResourceBundle;
 
 public class WelcomeController implements Initializable{
@@ -72,6 +74,16 @@ public class WelcomeController implements Initializable{
             FLDAccess.initializeFLDs();
             AppointmentAccess.initializeAppointments();
             CustomerAccess.initializeCustomers();
+
+            LocalDateTime start = LocalDateTime.of(LocalDate.now(), LocalTime.of(10, 0));
+            LocalDateTime end = LocalDateTime.of(LocalDate.now(), LocalTime.of(11, 30));
+            ZonedDateTime startZDT = ZonedDateTime.of(start, ZoneId.systemDefault());
+            ZonedDateTime endZDT = ZonedDateTime.of(end, ZoneId.systemDefault());
+
+            TimeHelper.addHasOverlap(75, startZDT, endZDT);
+
+
+
         } catch (Exception e) {
             AlertPopups.generateErrorMessage(GENERAL_ERROR_MESSAGE);
             e.printStackTrace();

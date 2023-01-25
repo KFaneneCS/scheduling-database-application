@@ -13,9 +13,14 @@ public class AppointmentAccess {
 
     private static final String ERROR_MESSAGE = "Sorry, there was an error.";
     public static final ObservableList<Appointment> allAppointments = FXCollections.observableArrayList();
+    public static final ObservableList<Appointment> filteredAppointments = FXCollections.observableArrayList();
 
     public static ObservableList<Appointment> getAllAppointments() {
         return allAppointments;
+    }
+
+    public static ObservableList<Appointment> getFilteredAppointments() {
+        return filteredAppointments;
     }
 
     public static void initializeAppointments() throws SQLException {
@@ -90,6 +95,19 @@ public class AppointmentAccess {
         return null;
     }
 
+    public static ObservableList<Appointment> lookupAppointments(String apptTitle) {
+
+        if (!getFilteredAppointments().isEmpty()) {
+            getFilteredAppointments().clear();
+        }
+        for (Appointment appointment : getAllAppointments()) {
+            if (appointment.getTitle().contains(apptTitle)) {
+                getFilteredAppointments().add(appointment);
+            }
+        }
+        return getFilteredAppointments();
+    }
+
     public static void executeAdd(String title, String description, String location, int contactId,
                                   String type, ZonedDateTime startZDT, ZonedDateTime endZDT, int customerId,
                                   int userId) throws SQLException {
@@ -98,7 +116,7 @@ public class AppointmentAccess {
                 customerId, userId, contactId) < 1) {
             AlertPopups.generateErrorMessage(ERROR_MESSAGE);
         } else {
-            ResultSet rs = AppointmentQueries.selectAppointment(title, description, startZDT);
+            ResultSet rs = AppointmentQueries.selectAppointmentByTable(title, description, startZDT);
 
             while (rs.next()) {
                 Appointment appointment = getApptObjFromDB(rs);

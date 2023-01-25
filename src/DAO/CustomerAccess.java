@@ -96,7 +96,7 @@ public class CustomerAccess {
         allCustomers.set(index, updatedCustomer);
     }
 
-    public static Customer lookupCustomers(int customerId) {
+    public static Customer lookupCustomer(int customerId) {
 
         for (Customer customer : getAllCustomers()) {
 
@@ -130,7 +130,7 @@ public class CustomerAccess {
         return -1;
     }
 
-    public static ObservableList<Customer> lookupCustomers(String customerName) {
+    public static ObservableList<Customer> lookupCustomer(String customerName) {
 
         if (!getFilteredCustomers().isEmpty()) {
             getFilteredCustomers().clear();

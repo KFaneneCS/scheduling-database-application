@@ -161,7 +161,7 @@ public class CustomersController implements Initializable {
                 if (AlertPopups.receiveConfirmation("Delete", DELETE_CONFIRMATION)) {
 
                     int customerId = Integer.parseInt(idTextField.getText());
-                    CustomerAccess.executeDelete(CustomerAccess.lookupCustomers(customerId));
+                    CustomerAccess.executeDelete(CustomerAccess.lookupCustomer(customerId));
                     fillCustomerTable();
 
 
@@ -185,7 +185,7 @@ public class CustomersController implements Initializable {
 
             ObservableList<Customer> customerList = customersTableView.getSelectionModel().getSelectedItem();
             int customerIdForSearch = Integer.parseInt(String.valueOf(customerList.get(0)));
-            Customer customer = CustomerAccess.lookupCustomers(customerIdForSearch);
+            Customer customer = CustomerAccess.lookupCustomer(customerIdForSearch);
 
             idTextField.setText(String.valueOf(customer.getId()));
             nameTextField.setText(customer.getName());
@@ -336,6 +336,7 @@ public class CustomersController implements Initializable {
     }
 
     public void filterTable(String text) throws SQLException {
+
         ObservableList<ResultSet> rsList = FXCollections.observableArrayList();
         try {
             if (text.isBlank()) {
@@ -343,7 +344,7 @@ public class CustomersController implements Initializable {
                 return;
             }
             int id = Integer.parseInt(text.strip());
-            Customer customer = CustomerAccess.lookupCustomers(id);
+            Customer customer = CustomerAccess.lookupCustomer(id);
             if (customer == null) {
                 throw new NullPointerException();
             } else {
@@ -351,7 +352,7 @@ public class CustomersController implements Initializable {
                 refreshTable(rs);
             }
         } catch (NumberFormatException numberFormatException) {
-            ObservableList<Customer> customersList = CustomerAccess.lookupCustomers(text.strip());
+            ObservableList<Customer> customersList = CustomerAccess.lookupCustomer(text.strip());
             if (customersList.size() < 1) {
                 fillCustomerTable();
                 AlertPopups.generateErrorMessage(NO_RESULTS_ERROR_MESSAGE);
