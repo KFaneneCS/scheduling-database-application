@@ -39,12 +39,10 @@ public class AppointmentController implements Initializable {
             "Sorry, the proposed timeframe overlaps with an existing appointment.";
     private static final String CHANGE_CONFIRMATION = "Confirm changes?";
     private static final String DELETE_CONFIRMATION = "Are you sure you want to delete this appointment?";
+    private static final String ADD_SUCCESS_MESSAGE = "Appointment successfully added.";
     boolean addListenerTriggered = false;
     boolean startDateChosen = false;
     boolean appointmentSelected = false;
-    boolean allDisplayed = false;
-    boolean monthDisplayed = false;
-    boolean weekDisplayed = false;
 
     @FXML
     private Button addButton;
@@ -181,6 +179,9 @@ public class AppointmentController implements Initializable {
     @FXML
     private Label userNameLabel;
 
+    @FXML
+    private Button viewReportsButton;
+
 
     @FXML
     void onActionAddAppointment(ActionEvent event) {
@@ -226,6 +227,8 @@ public class AppointmentController implements Initializable {
             AppointmentAccess.executeAdd(title, description, location, contactId,
                     type, startZDT, endZDT, customerId, userId);
             fillAllAppointmentTables();
+            AlertPopups.generateInfoMessage("Add successful", ADD_SUCCESS_MESSAGE);
+            clearFields();
 
 
         } catch (NullPointerException npe) {
@@ -241,19 +244,10 @@ public class AppointmentController implements Initializable {
     @FXML
     void onActionClearTextFields(ActionEvent event) throws SQLException {
 
-        idTextField.setText("auto-generated");
-        titleTextField.clear();
-        descriptionTextField.clear();
-        locationTextField.clear();
-        typeTextField.clear();
-        contactComboBox.setItems(null);
-        customerNameComboBox.setItems(null);
-        userNameComboBox.setItems(null);
-        fillComboAndDates();
-
+        clearFields();
         addButton.setDisable(false);
-
         appointmentSelected = false;
+
     }
 
     @FXML
@@ -265,7 +259,6 @@ public class AppointmentController implements Initializable {
         }
 
         int appointmentId = Integer.parseInt(idTextField.getText());
-        System.out.println("ID selected: " + appointmentId);
 
         if (AlertPopups.receiveConfirmation("Delete", DELETE_CONFIRMATION)) {
             AppointmentAccess.executeDelete(appointmentId);
@@ -301,7 +294,6 @@ public class AppointmentController implements Initializable {
                 tableView = currWeekTableView;
             } else {
                 tableView = null;
-                System.out.println("TABLEVIEW IS NULL!");
             }
 
             ObservableList<Appointment> appointmentList =
@@ -410,6 +402,11 @@ public class AppointmentController implements Initializable {
 
 
         }
+    }
+
+    @FXML
+    void onActionViewReports(ActionEvent event) throws IOException {
+        sceneChanger.changeScreen(event, "Reports");
     }
 
 
@@ -558,7 +555,6 @@ public class AppointmentController implements Initializable {
             tableView = currWeekTableView;
             tableNum = 3;
         } else {
-            System.out.println("TABLEVIEW IS NULL!");
         }
         ObservableList<ResultSet> rsList = FXCollections.observableArrayList();
         try {
@@ -603,6 +599,18 @@ public class AppointmentController implements Initializable {
         fillAppointmentTable(allAppointmentsTableView, rsAll);
         fillAppointmentTable(currMonthTableView, rsMonth);
         fillAppointmentTable(currWeekTableView, rsWeek);
+    }
+
+    public void clearFields() throws SQLException {
+        idTextField.setText("auto-generated");
+        titleTextField.clear();
+        descriptionTextField.clear();
+        locationTextField.clear();
+        typeTextField.clear();
+        contactComboBox.setItems(null);
+        customerNameComboBox.setItems(null);
+        userNameComboBox.setItems(null);
+        fillComboAndDates();
     }
 
 

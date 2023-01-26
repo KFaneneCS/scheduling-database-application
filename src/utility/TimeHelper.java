@@ -92,8 +92,9 @@ public class TimeHelper {
         int minute = Integer.parseInt(minuteString);
         LocalTime localTime = LocalTime.of(hour, minute);
         LocalDateTime localDateTime = LocalDateTime.of(localDate, localTime);
-        ZoneId localZoneId = ZoneId.of("UTC");
-        return ZonedDateTime.of(localDateTime, localZoneId);
+        ZoneId localZoneId = ZoneId.systemDefault();
+        ZonedDateTime zdtLocal = localDateTime.atZone(localZoneId);
+        return zdtLocal.withZoneSameInstant(ZoneId.of("UTC"));
     }
 
 

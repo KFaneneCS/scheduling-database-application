@@ -36,7 +36,6 @@ public class AppointmentAccess {
             AlertPopups.generateErrorMessage(ERROR_MESSAGE);
             e.printStackTrace();
         }
-        System.out.println("TEST2:  Appointment size = " + getAllAppointments().size());
     }
 
     public static void addAppointment(Appointment appointment) {

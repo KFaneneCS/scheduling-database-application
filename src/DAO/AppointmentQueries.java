@@ -17,9 +17,6 @@ public class AppointmentQueries {
 
     public static final String GENERAL_ERROR_MESSAGE = "Sorry, there was an error.";
 
-    // TODO:  Continue here
-//    public static int insertAppointment
-
     public static int insertAppointment(String ti, String d, String l, String ty, ZonedDateTime start,
                                         ZonedDateTime end, int custId, int userId, int contId) throws SQLException {
         try {
@@ -32,6 +29,7 @@ public class AppointmentQueries {
             ps.setString(3, l);
             ps.setString(4, ty);
             ps.setString(5, TimeHelper.zdtToString(start));
+            System.out.println("TEST:  The String that is passed to the database when insertAppointment is called == " + TimeHelper.zdtToString(start));
             ps.setString(6, TimeHelper.zdtToString(end));
             ps.setInt(7, custId);
             ps.setInt(8, userId);

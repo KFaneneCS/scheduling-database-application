@@ -23,6 +23,13 @@ public class AlertPopups {
         alert.showAndWait();
     }
 
+    public static void generateInfoMessage(String title, String messageToDisplay) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setContentText(messageToDisplay);
+        alert.showAndWait();
+    }
+
     public static void generateCancelConfirmationMessage(int appointmentId, String type) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Appointment Cancellation Confirmation");

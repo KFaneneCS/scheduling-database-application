@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import model.Appointment;
 import model.User;
@@ -27,7 +28,7 @@ public class LoginController implements Initializable {
 
     String ERROR_MESSAGE = "Error";
     String CREDENTIALS_ERROR = "invalid_credentials";
-    SceneChanger screenChanger = new SceneChanger();
+    SceneChanger sceneChanger = new SceneChanger();
     @FXML
     private Button loginButton;
     @FXML
@@ -36,14 +37,13 @@ public class LoginController implements Initializable {
     private Label userLocationLabel;
 
     @FXML
-    private TextField passwordTextField;
+    private PasswordField passwordField;
 
     @FXML
     private TextField usernameTextField;
 
     @FXML
     void onActionLogin(ActionEvent event) throws SQLException {
-        System.out.println("~Login button clicked");
 
         String loginUsername = usernameTextField.getText();
         try {
@@ -52,21 +52,19 @@ public class LoginController implements Initializable {
             if (user == null) {
                 AlertPopups.generateErrorMessage(CREDENTIALS_ERROR);
             } else {
-                String loginPassword = passwordTextField.getText();
+                String loginPassword = passwordField.getText();
 
                 try {
                     if (Objects.equals(loginPassword, user.getPassword())) {
 
-                        System.out.println("TEST:  User is = " + user.getId());
                         try {
                             TimeHelper.checkUpcomingAppointment(user);
                             Appointment assocAppt = TimeHelper.checkUpcomingAppointment(user);
-                            System.out.println("Associated appointment = " + assocAppt.getTitle());
                             AlertPopups.generateUpcomingApptMessage(assocAppt);
                         } catch (NullPointerException npe) {
                             AlertPopups.generateUpcomingApptMessage(null);
                         }
-                        screenChanger.changeScreen(event, "Welcome");
+                        sceneChanger.changeScreen(event, "Welcome");
 
                     } else {
                         AlertPopups.generateErrorMessage(CREDENTIALS_ERROR);
@@ -84,14 +82,13 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        System.out.println("~LoginController is initialized");
 
         ZoneId userLocation = ZoneId.of(TimeZone.getDefault().getID());
         userLocationLabel.setText(userLocation.toString());
 
         loginLabel.setText(translate(loginLabel.getText()));
         usernameTextField.setPromptText(translate(usernameTextField.getPromptText()));
-        passwordTextField.setPromptText(translate(passwordTextField.getPromptText()));
+        passwordField.setPromptText(translate(passwordField.getPromptText()));
         loginButton.setText(translate(loginButton.getText()));
 
         try {

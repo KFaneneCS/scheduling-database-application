@@ -24,7 +24,7 @@ public class CustomersController implements Initializable {
 
     private final ObservableList<String> countriesList = FXCollections
             .observableArrayList("U.S", "UK", "Canada");
-    SceneChanger screenChanger = new SceneChanger();
+    SceneChanger sceneChanger = new SceneChanger();
     String GENERAL_ERROR_MESSAGE = "Sorry, there was an error.";
     String EMPTY_ERROR_MESSAGE = "Sorry, all fields must be filled in.";
     String NO_RESULTS_ERROR_MESSAGE = "Sorry, could not find any results.";
@@ -175,7 +175,7 @@ public class CustomersController implements Initializable {
 
     @FXML
     void onActionDisplayWelcome(ActionEvent event) throws IOException {
-        screenChanger.changeScreen(event, "Welcome");
+        sceneChanger.changeScreen(event, "Welcome");
     }
 
     @FXML
@@ -195,7 +195,7 @@ public class CustomersController implements Initializable {
             countryComboBox.setValue(customer.getCountry());
             stateProvinceComboBox.setValue(customer.getFirstLevelDiv());
 
-            System.out.println("TEST:  Customer start date using conversion === " + customer.getCreateDate());
+            System.out.println(customer.getCreateDate());
 
             addButton.setDisable(true);
 
@@ -372,7 +372,7 @@ public class CustomersController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        System.out.println("~CustomersController initialized");
+
         fillCustomerTable();
         countryComboBox.setValue("U.S");
         countryComboBox.setItems(countriesList);
