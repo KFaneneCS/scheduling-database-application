@@ -13,26 +13,27 @@ public abstract class JDBC {
     private static final String userName = "sqlUser"; // Username
     private static final String password = "Passw0rd!"; // Password
     public static java.sql.Connection connection;  // JDBC Interface
+    private static final String GENERAL_ERROR_MESSAGE = "Sorry, there was an error.";
 
     public static void openConnection()
     {
         try {
             Class.forName(driver); // Locate Driver
             connection = DriverManager.getConnection(jdbcUrl, userName, password); // Reference JDBC object
-            System.out.println("~JDBC successful!\n");  // FIXME: DWC
         }
         catch(Exception e)
         {
-            System.out.println("~Error:" + e.getMessage());  // FIXME: DWC
+            AlertPopups.generateErrorMessage(GENERAL_ERROR_MESSAGE);
+            e.printStackTrace();
         }
     }
 
     public static void closeConnection() {
         try {
             connection.close();
-            System.out.println("~JDBC closed!");  // FIXME: DWC
         } catch(Exception e) {
-            AlertPopups.generateErrorMessage(e.getMessage());
+            AlertPopups.generateErrorMessage(GENERAL_ERROR_MESSAGE);
+            e.printStackTrace();
         }
     }
 }

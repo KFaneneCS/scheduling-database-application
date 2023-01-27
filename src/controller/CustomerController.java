@@ -20,7 +20,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
-public class CustomersController implements Initializable {
+public class CustomerController implements Initializable {
 
     private final ObservableList<String> countriesList = FXCollections
             .observableArrayList("U.S", "UK", "Canada");
@@ -194,8 +194,6 @@ public class CustomersController implements Initializable {
             phoneTextField.setText(customer.getPhone());
             countryComboBox.setValue(customer.getCountry());
             stateProvinceComboBox.setValue(customer.getFirstLevelDiv());
-
-            System.out.println(customer.getCreateDate());
 
             addButton.setDisable(true);
 

@@ -15,7 +15,7 @@ import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 
 public class AppointmentQueries {
 
-    public static final String GENERAL_ERROR_MESSAGE = "Sorry, there was an error.";
+    private static final String GENERAL_ERROR_MESSAGE = "Sorry, there was an error.";
 
     public static int insertAppointment(String ti, String d, String l, String ty, ZonedDateTime start,
                                         ZonedDateTime end, int custId, int userId, int contId) throws SQLException {

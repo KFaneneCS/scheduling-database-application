@@ -14,21 +14,29 @@ import utility.AlertPopups;
 import utility.SceneChanger;
 import utility.TimeHelper;
 
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
-import java.sql.SQLException;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.Scanner;
 import java.util.TimeZone;
 
 import static translation.Translation.translate;
 
 public class LoginController implements Initializable {
 
-    String ERROR_MESSAGE = "Error";
+    String GENERAL_ERROR_MESSAGE = "Sorry, there was an error.";
     String CREDENTIALS_ERROR = "invalid_credentials";
     SceneChanger sceneChanger = new SceneChanger();
+    String fileName = "login_activity.txt", login;
+    Scanner keyboard = new Scanner(System.in);
+    FileWriter fileWriter = new FileWriter(fileName, true);
+    PrintWriter outputFile = new PrintWriter(fileWriter);
     @FXML
     private Button loginButton;
     @FXML
@@ -42,40 +50,51 @@ public class LoginController implements Initializable {
     @FXML
     private TextField usernameTextField;
 
-    @FXML
-    void onActionLogin(ActionEvent event) throws SQLException {
+    public LoginController() throws IOException {
+    }
 
+    @FXML
+    void onActionLogin(ActionEvent event) {
+
+//        Scene scene = loginButton.getScene();
+//        scene.getWindow().setOnCloseRequest((e) -> {
+//            outputFile.close();
+//        });
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss (z)");
+        String now = ZonedDateTime.now().withZoneSameInstant(ZoneId.of("UTC")).format(formatter);
         String loginUsername = usernameTextField.getText();
         try {
             int userId = UserQueries.convertToUserId(loginUsername);
             User user = UserAccess.lookupUser(userId);
             if (user == null) {
-                AlertPopups.generateErrorMessage(CREDENTIALS_ERROR);
+                // login NOT successful
+                outputFile.println("User " + loginUsername + " gave invalid log-in at " + now);
+                outputFile.flush();
+                AlertPopups.generateLoginErrorMessage(CREDENTIALS_ERROR);
             } else {
                 String loginPassword = passwordField.getText();
-
-                try {
-                    if (Objects.equals(loginPassword, user.getPassword())) {
-
-                        try {
-                            TimeHelper.checkUpcomingAppointment(user);
-                            Appointment assocAppt = TimeHelper.checkUpcomingAppointment(user);
-                            AlertPopups.generateUpcomingApptMessage(assocAppt);
-                        } catch (NullPointerException npe) {
-                            AlertPopups.generateUpcomingApptMessage(null);
-                        }
-                        sceneChanger.changeScreen(event, "Welcome");
-
-                    } else {
-                        AlertPopups.generateErrorMessage(CREDENTIALS_ERROR);
+                if (Objects.equals(loginPassword, user.getPassword())) {
+                    // login successful
+                    try {
+                        outputFile.println("User " + loginUsername + " successfully logged in at " + now);
+                        TimeHelper.checkUpcomingAppointment(user);
+                        Appointment assocAppt = TimeHelper.checkUpcomingAppointment(user);
+                        AlertPopups.generateUpcomingApptMessage(assocAppt);
+                    } catch (NullPointerException npe) {
+                        AlertPopups.generateUpcomingApptMessage(null);
                     }
-                } catch (IOException ioe) {
-                    AlertPopups.generateErrorMessage(ERROR_MESSAGE);
-                    ioe.printStackTrace();
+                    sceneChanger.changeScreen(event, "Welcome");
+                    outputFile.close();
+                } else {
+                    // login NOT successful
+                    outputFile.println("User " + loginUsername + " gave invalid log-in at " + now);
+                    outputFile.flush();
+                    AlertPopups.generateLoginErrorMessage(CREDENTIALS_ERROR);
                 }
             }
+
         } catch (Exception e) {
-            AlertPopups.generateErrorMessage(ERROR_MESSAGE);
+            AlertPopups.generateLoginErrorMessage(GENERAL_ERROR_MESSAGE);
             e.printStackTrace();
         }
     }
@@ -101,8 +120,10 @@ public class LoginController implements Initializable {
             TimeHelper.setHoursList();
 
         } catch (Exception e) {
-            AlertPopups.generateErrorMessage(ERROR_MESSAGE);
+            AlertPopups.generateErrorMessage(GENERAL_ERROR_MESSAGE);
             e.printStackTrace();
         }
+
     }
+
 }

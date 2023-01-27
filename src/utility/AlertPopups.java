@@ -4,7 +4,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import model.Appointment;
 
-import java.util.MissingResourceException;
 import java.util.Optional;
 
 import static translation.Translation.translate;
@@ -13,13 +12,15 @@ public class AlertPopups {
 
     public static void generateErrorMessage(String messageToDisplay) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        try {
-            alert.setTitle(translate(("Error")));
-            alert.setContentText(translate(messageToDisplay));
-        } catch (MissingResourceException e) {
-            alert.setTitle("Error");
-            alert.setContentText(messageToDisplay);
-        }
+        alert.setTitle("Error");
+        alert.setContentText(messageToDisplay);
+        alert.showAndWait();
+    }
+
+    public static void generateLoginErrorMessage(String messageToDisplay) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(translate(("Error")));
+        alert.setContentText(translate(messageToDisplay));
         alert.showAndWait();
     }
 
@@ -46,12 +47,12 @@ public class AlertPopups {
 
     public static void generateUpcomingApptMessage(Appointment assocAppt) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Upcoming Appointment");
+        alert.setTitle(translate("upcoming_appointments"));
         if (assocAppt == null) {
-            alert.setContentText("No upcoming appointments.");
+            alert.setContentText(translate("no_upcoming_appointments"));
         } else {
-            alert.setContentText("You have an upcoming appointment! \nID: " + assocAppt.getId() + "\nDate: " +
-                    assocAppt.getStart().toLocalDate() + "\nTime: " + assocAppt.getStart().toLocalTime());
+            alert.setContentText(translate("yes_upcoming_appointments") + "\nID: " + assocAppt.getId() + "\nDate: " +
+                    assocAppt.getStart().toLocalDate() + "\n" + translate("time") + assocAppt.getStart().toLocalTime());
         }
         alert.showAndWait();
     }
