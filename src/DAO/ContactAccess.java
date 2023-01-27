@@ -17,7 +17,7 @@ public class ContactAccess {
         return allContacts;
     }
 
-    public static void initializeContacts() throws SQLException {
+    public static void initializeContacts() {
 
         try {
             ResultSet rs = ContactQueries.selectAllContacts();
@@ -32,7 +32,7 @@ public class ContactAccess {
         }
     }
 
-    public static void addContact(Contact contact) throws SQLException {
+    public static void addContact(Contact contact) {
         allContacts.add(contact);
     }
 

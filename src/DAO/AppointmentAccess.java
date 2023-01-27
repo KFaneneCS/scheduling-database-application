@@ -42,7 +42,7 @@ public class AppointmentAccess {
         allAppointments.add(appointment);
     }
 
-    public static boolean deleteAppointment(Appointment appointment) {
+    public static boolean removeAppointment(Appointment appointment) {
         return allAppointments.remove(appointment);
     }
 
@@ -131,14 +131,11 @@ public class AppointmentAccess {
 
         if (apptToDelete == null) {
             AlertPopups.generateErrorMessage(ERROR_MESSAGE);
-        }
-        else if (AppointmentQueries.deleteAppointment(appointmentId) < 1) {
+        } else if (AppointmentQueries.deleteAppointment(appointmentId) < 1) {
             AlertPopups.generateErrorMessage(ERROR_MESSAGE);
-        }
-        else {
+        } else {
             AlertPopups.generateCancelConfirmationMessage(apptToDelete.getId(), apptToDelete.getType());
-            deleteAppointment(apptToDelete);
-            System.out.println("TEST:  I'm here!");
+            removeAppointment(apptToDelete);
         }
     }
 

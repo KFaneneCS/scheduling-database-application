@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import model.Appointment;
 import model.User;
 import utility.AlertPopups;
@@ -23,18 +24,16 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.ResourceBundle;
-import java.util.Scanner;
 import java.util.TimeZone;
 
 import static translation.Translation.translate;
 
 public class LoginController implements Initializable {
 
-    String GENERAL_ERROR_MESSAGE = "Sorry, there was an error.";
-    String CREDENTIALS_ERROR = "invalid_credentials";
-    SceneChanger sceneChanger = new SceneChanger();
-    String fileName = "login_activity.txt", login;
-    Scanner keyboard = new Scanner(System.in);
+    private static final String GENERAL_ERROR_MESSAGE = "Sorry, there was an error.";
+    private static final String CREDENTIALS_ERROR = "invalid_credentials";
+    private static final SceneChanger sceneChanger = new SceneChanger();
+    String fileName = "login_activity.txt";
     FileWriter fileWriter = new FileWriter(fileName, true);
     PrintWriter outputFile = new PrintWriter(fileWriter);
     @FXML
@@ -56,10 +55,18 @@ public class LoginController implements Initializable {
     @FXML
     void onActionLogin(ActionEvent event) {
 
-//        Scene scene = loginButton.getScene();
-//        scene.getWindow().setOnCloseRequest((e) -> {
-//            outputFile.close();
-//        });
+        try {
+            if (executeLoginAttempt()) {
+                sceneChanger.changeScreen(event, "Welcome");
+            }
+        } catch (Exception e) {
+            AlertPopups.generateErrorMessage(GENERAL_ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+
+
+    public boolean executeLoginAttempt() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss (z)");
         String now = ZonedDateTime.now().withZoneSameInstant(ZoneId.of("UTC")).format(formatter);
         String loginUsername = usernameTextField.getText();
@@ -83,8 +90,9 @@ public class LoginController implements Initializable {
                     } catch (NullPointerException npe) {
                         AlertPopups.generateUpcomingApptMessage(null);
                     }
-                    sceneChanger.changeScreen(event, "Welcome");
                     outputFile.close();
+                    return true;
+
                 } else {
                     // login NOT successful
                     outputFile.println("User " + loginUsername + " gave invalid log-in at " + now);
@@ -92,11 +100,11 @@ public class LoginController implements Initializable {
                     AlertPopups.generateLoginErrorMessage(CREDENTIALS_ERROR);
                 }
             }
-
         } catch (Exception e) {
-            AlertPopups.generateLoginErrorMessage(GENERAL_ERROR_MESSAGE);
+            AlertPopups.generateErrorMessage(GENERAL_ERROR_MESSAGE);
             e.printStackTrace();
         }
+        return false;
     }
 
     @Override
@@ -109,6 +117,32 @@ public class LoginController implements Initializable {
         usernameTextField.setPromptText(translate(usernameTextField.getPromptText()));
         passwordField.setPromptText(translate(passwordField.getPromptText()));
         loginButton.setText(translate(loginButton.getText()));
+
+        usernameTextField.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ENTER) {
+                try {
+                    if (executeLoginAttempt()) {
+                        sceneChanger.changeScreen(e, "Welcome");
+                    }
+                } catch (Exception ex) {
+                    AlertPopups.generateErrorMessage(GENERAL_ERROR_MESSAGE);
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        passwordField.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ENTER) {
+                try {
+                    if (executeLoginAttempt()) {
+                        sceneChanger.changeScreen(e, "Welcome");
+                    }
+                } catch (Exception ex) {
+                    AlertPopups.generateErrorMessage(GENERAL_ERROR_MESSAGE);
+                    ex.printStackTrace();
+                }
+            }
+        });
 
         try {
             ContactAccess.initializeContacts();

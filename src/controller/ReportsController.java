@@ -16,12 +16,14 @@ import model.Contact;
 import model.Country;
 import utility.AlertPopups;
 import utility.SceneChanger;
+import utility.TimeHelper;
 
 import java.io.IOException;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class ReportsController implements Initializable {
@@ -84,11 +86,6 @@ public class ReportsController implements Initializable {
         String country = countryComboBox.getValue();
         totalByCountryTextField.setText(String.valueOf(ReportsQueries.selectTotalByCountry(country)));
     }
-
-//    @FXML
-//    void onActionDisplayAppointment(ActionEvent event) throws IOException {
-//        sceneChanger.changeScreen(event, "Appointment");
-//    }
 
     @FXML
     void onActionEnableMonth(ActionEvent event) {
@@ -161,7 +158,12 @@ public class ReportsController implements Initializable {
             while (rs.next()) {
                 ObservableList<String> row = FXCollections.observableArrayList();
                 for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-                    row.add(rs.getString(i));
+                    if ((Objects.equals(rs.getMetaData().getColumnName(i), "Start")) ||
+                            (Objects.equals(rs.getMetaData().getColumnName(i), "End"))) {
+                        row.add(TimeHelper.dbStringToLocalString(rs.getString(i)));
+                    } else {
+                        row.add(rs.getString(i));
+                    }
                 }
                 data.add(row);
             }

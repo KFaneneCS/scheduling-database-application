@@ -18,6 +18,10 @@ public class FLDAccess {
         return allFLDs;
     }
 
+    public static void addFLD(FirstLevelDivision fld) {
+        allFLDs.add(fld);
+    }
+
     public static ObservableList<String> getFilteredFLDsAsStrings(int countryId) throws SQLException {
         return FLDQueries.getDivisionList(countryId);
     }
@@ -35,10 +39,6 @@ public class FLDAccess {
             AlertPopups.generateErrorMessage(ERROR_MESSAGE);
             e.printStackTrace();
         }
-    }
-
-    public static void addFLD(FirstLevelDivision fld) {
-        allFLDs.add(fld);
     }
 
     public static FirstLevelDivision getFLDObjectFromDB(ResultSet rs) throws SQLException {

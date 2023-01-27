@@ -9,11 +9,10 @@ import java.sql.SQLException;
 
 public class CustomerQueries {
 
-
     public static final String GENERAL_ERROR_MESSAGE = "Sorry, there was an error.";
 
     public static int insertCustomer(String n, String a, String pc,
-                                     String ph, int d) throws SQLException {
+                                     String ph, int d) {
         try {
             String sql = "INSERT INTO customers (Customer_Name, Address, Postal_Code, Phone, " +
                     "Create_Date, Created_By, Last_Update, Last_Updated_By, Division_ID) " +
@@ -30,19 +29,6 @@ public class CustomerQueries {
             e.printStackTrace();
             return -1;
         }
-    }
-
-    public static int convertToCustomerId(String customerName, String customerAddress) throws SQLException {
-        String sql = "SELECT * FROM customers WHERE Customer_Name = ? AND Address = ?";
-        PreparedStatement ps = JDBC.connection.prepareStatement(sql);
-        ps.setString(1, customerName);
-        ps.setString(2, customerAddress);
-        ResultSet rs = ps.executeQuery();
-
-        while (rs.next()) {
-            return rs.getInt("Customer_ID");
-        }
-        return 0;   // TODO:  Account for 0 in calls
     }
 
     public static int updateCustomer(int cusId, String name, String address, String postalCode,
@@ -68,34 +54,6 @@ public class CustomerQueries {
         return JDBC.connection.createStatement().executeQuery(sql);
     }
 
-//    public static ObservableList<String> selectAllCustomers(String columnName) throws SQLException {
-//
-//        ObservableList<String> dataList = FXCollections.observableArrayList();
-//
-//        String sql = "SELECT * FROM client_schedule.customers";
-//        PreparedStatement ps = JDBC.connection.prepareStatement(sql);
-//        ResultSet rs = ps.executeQuery();
-//        while (rs.next()) {
-//            String data = rs.getString(columnName);
-//            dataList.add(data);
-//        }
-//        return dataList;
-//    }
-
-//    public static ObservableList<Customer> selectAllCustomers(String columnName) throws SQLException {
-//
-//        ObservableList<String> dataList = FXCollections.observableArrayList();
-//
-//        String sql = "SELECT * FROM client_schedule.customers";
-//        PreparedStatement ps = JDBC.connection.prepareStatement(sql);
-//        ResultSet rs = ps.executeQuery();
-//        while (rs.next()) {
-//            String data = rs.getString(columnName);
-//            dataList.add(data);
-//        }
-//        return dataList;
-//    }
-
     public static ResultSet selectCustomer(String name, String address) throws SQLException {
 
         String sql = "SELECT * FROM client_schedule.customers WHERE Customer_Name = ? AND Address = ?";
@@ -119,13 +77,5 @@ public class CustomerQueries {
         ps.setInt(1, id);
         return ps.executeUpdate();
     }
-
-//    public static ResultSet selectCustomer(String name) throws SQLException {
-//
-//        String sql = "SELECT * FROM client_schedule.customers WHERE Customer_Name = ?";
-//        PreparedStatement ps = JDBC.connection.prepareStatement(sql);
-//        ps.setString(1, name);
-//        return ps.executeQuery();
-//    }
 
 }

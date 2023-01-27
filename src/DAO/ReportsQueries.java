@@ -10,9 +10,6 @@ import java.sql.SQLException;
 
 public class ReportsQueries {
 
-    private static final String GENERAL_ERROR_MESSAGE = "Sorry, there was an error.";
-
-
     public static ObservableList<String> selectDistinctTypes() throws SQLException {
 
         ObservableList<String> typesList = FXCollections.observableArrayList();
@@ -25,6 +22,7 @@ public class ReportsQueries {
         }
         return typesList;
     }
+
     public static int selectTotalByTypeMonth(int year, int month, String type) throws SQLException {
 
         String sql = "SELECT TotalValue FROM " +
@@ -71,6 +69,5 @@ public class ReportsQueries {
         ps.setInt(1, contactId);
         return ps.executeQuery();
     }
-
 
 }

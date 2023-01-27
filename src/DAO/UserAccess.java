@@ -7,6 +7,7 @@ import utility.AlertPopups;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Objects;
 
 public class UserAccess {
 
@@ -50,7 +51,7 @@ public class UserAccess {
 
         for (User user : getAllUsers()) {
 
-            if (user.getName() == userName) {
+            if (Objects.equals(user.getName(), userName)) {
                 return user.getId();
             }
         }

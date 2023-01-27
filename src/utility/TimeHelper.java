@@ -29,45 +29,41 @@ public class TimeHelper {
 
     public static ZonedDateTime utcToLocal(ZonedDateTime dateUTC) {
         ZoneId localZoneId = ZoneId.of(TimeZone.getDefault().getID());
-//        ZonedDateTime utcToLocal = dateUTC.toInstant().atZone(localZoneId);
-        ZonedDateTime utcToLocal = dateUTC.toInstant().atZone(localZoneId);
-        return utcToLocal;
+        return dateUTC.toInstant().atZone(localZoneId);
     }
 
     public static ZonedDateTime localToUTC(ZonedDateTime dateLocal) {
         ZoneId utcZoneId = ZoneId.of("UTC");
-        ZonedDateTime localToUTC = dateLocal.toInstant().atZone(utcZoneId);
-        return localToUTC;
+        return dateLocal.toInstant().atZone(utcZoneId);
     }
 
     public static ZonedDateTime utcToEST(ZonedDateTime dateUTC) {
         ZoneId estZoneId = ZoneId.of("America/New_York");
-        ZonedDateTime utcToEST = dateUTC.toInstant().atZone(estZoneId);
-        return utcToEST;
+        return dateUTC.toInstant().atZone(estZoneId);
     }
 
     public static ZonedDateTime estToLocal(ZonedDateTime dateEST) {
         ZoneId localZoneId = ZoneId.of(TimeZone.getDefault().getID());
-        ZonedDateTime estToLocal = dateEST.toInstant().atZone(localZoneId);
-        return estToLocal;
+        return dateEST.toInstant().atZone(localZoneId);
     }
 
     public static ZonedDateTime stringToZDT(String dbDateTimeString) {
 
-//        LocalDateTime ldt = LocalDateTime.parse(dbDateTimeString, STANDARD_FORMATTER);
-//        return ldt.atZone(ZoneId.systemDefault());
         LocalDateTime ldt = LocalDateTime.parse(dbDateTimeString, STANDARD_FORMATTER);
         return utcToLocal(ldt.atZone(ZoneId.of("UTC")));
     }
 
-    public static String zdtToString(ZonedDateTime zdt) {
-        zdt = localToUTC(zdt);
-        return zdt.format(STANDARD_FORMATTER);
+    public static String dbStringToLocalString(String dbDateTimeString) {
+
+        LocalDateTime ldt = LocalDateTime.parse(dbDateTimeString, STANDARD_FORMATTER);
+        ZonedDateTime dbZDT = ZonedDateTime.of(ldt, ZoneId.of("UTC"));
+        ZonedDateTime localZDT = utcToLocal(dbZDT);
+        return localZDT.format(STANDARD_FORMATTER);
     }
 
-    public static String currDateTimeAsString() {
-        LocalDateTime currDT = LocalDateTime.now();
-        return currDT.format(STANDARD_FORMATTER);
+    public static String zdtToString(ZonedDateTime zdt) {
+
+        return zdt.format(STANDARD_FORMATTER);
     }
 
     public static void setHoursList() {
@@ -132,11 +128,11 @@ public class TimeHelper {
                 }
             }
         }
-        System.out.println("NO OVERLAP");
         return false;
     }
 
-    public static boolean updateHasOverlap(int customerId, int appointmentId, ZonedDateTime checkStart, ZonedDateTime checkEnd) {
+    public static boolean updateHasOverlap(int customerId, int appointmentId,
+                                           ZonedDateTime checkStart, ZonedDateTime checkEnd) {
 
         for (Appointment appointment : AppointmentAccess.getAllAppointments()) {
 
@@ -151,10 +147,9 @@ public class TimeHelper {
 
                 if (isOverlapping(checkStart, checkEnd, start, end)) {
                     return true;
-                };
+                }
             }
         }
-        System.out.println("NO OVERLAP");
         return false;
     }
 
@@ -163,75 +158,15 @@ public class TimeHelper {
 
         // Check #1
         if ((checkS.isAfter(start) || (checkS.isEqual(start))) && ((checkS.isBefore(end)))) {
-
-            System.out.println("Confirmed OVERLAP");
             return true;
         }
 
         // Check #2
         if ((checkE.isAfter(start)) && (checkE.isBefore(end) || checkE.isEqual(end))) {
-
-            System.out.println("Confirmed OVERLAP");
             return true;
         }
 
         // Check #3
-        if ((checkS.isBefore(start) || checkS.isEqual(start)) && (checkE.isAfter(end) || checkE.isEqual(end))) {
-
-            System.out.println("Confirmed OVERLAP");
-            return true;
-        }
-        return false;
+        return (checkS.isBefore(start) || checkS.isEqual(start)) && (checkE.isAfter(end) || checkE.isEqual(end));
     }
 }
-
-
-//        switch (choiceId) {
-//            case 0:
-//                // return hour list;
-//
-//
-//
-//            case 1:
-//                // return minute list
-//
-//
-//
-//
-//            default:
-//                AlertPopups.generateErrorMessage("Error");
-//                return null;
-//        }
-
-
-        //    public static void experimenting() {        // FIXME:  Delete
-//
-////        // All user's current info
-////        LocalDate date = LocalDate.now();
-////        System.out.println("Current date: " + date);
-////        LocalTime time = LocalTime.now();
-////        System.out.println("Current time: " + time);
-////        ZoneId zoneId = ZoneId.of(TimeZone.getDefault().getID());
-////        System.out.println("Current zoneId: " + zoneId);
-////
-////        // Creates ZDT object from user's info
-////        ZonedDateTime localZDT = ZonedDateTime.of(date, time, zoneId);
-////        System.out.println("ZonedDateTime using above: " + localZDT);
-////
-////        // Convert ZDT to Instant in order to make UTC conversion
-////        Instant localToUTCInstant = localZDT.toInstant();
-////        System.out.println("Local-to-UTC Instant Object: " + localToUTCInstant);
-////
-////        // Convert instant object to ZDT
-////        ZonedDateTime utcLocalToZDT = localToUTCInstant.atZone(ZoneId.of("UTC"));
-////        System.out.println("Changing Instant to ZDT object: " + utcLocalToZDT);
-////
-////        // Convert back to local time
-////        ZonedDateTime utcToLocal = localToUTCInstant.atZone(zoneId);
-////        System.out.println("UTC Instant back to local: " + utcToLocal);
-////
-////        System.out.println("\n");
-////
-////    }
-
-

@@ -23,6 +23,14 @@ public class CustomerAccess {
         return filteredCustomers;
     }
 
+    public static void addCustomer(Customer customer) {
+        allCustomers.add(customer);
+    }
+
+    public static void removeCustomer(Customer customer) {
+        allCustomers.remove(customer);
+    }
+
     public static boolean executeDelete(Customer customer) throws SQLException {
 
         try {
@@ -46,6 +54,7 @@ public class CustomerAccess {
 
         if (CustomerQueries.deleteCustomer(customer.getId()) == 1) {
             AlertPopups.generateDeleteConfirmationMessage(customer.getId(), customer.getName());
+            removeCustomer(customer);
             return true;
         }
 
@@ -53,8 +62,6 @@ public class CustomerAccess {
         return false;
     }
 
-
-    //Methods
     public static void initializeCustomers() {
 
         try {
@@ -68,10 +75,6 @@ public class CustomerAccess {
             AlertPopups.generateErrorMessage(ERROR_MESSAGE);
             e.printStackTrace();
         }
-    }
-
-    public static void addCustomer(Customer customer) {
-        allCustomers.add(customer);
     }
 
 

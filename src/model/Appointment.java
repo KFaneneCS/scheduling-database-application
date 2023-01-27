@@ -6,7 +6,6 @@ import java.time.ZonedDateTime;
 
 public class Appointment {
 
-
     private final int id;
     private final String title;
     private final String description;

@@ -25,11 +25,11 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.MonthDay;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class AppointmentController implements Initializable {
 
-    SceneChanger sceneChanger = new SceneChanger();
     private static final String GENERAL_ERROR_MESSAGE = "Sorry, there was an error.";
     private static final String EMPTY_ERROR_MESSAGE = "Sorry, all fields must be filled in.";
     private static final String NO_RESULTS_ERROR_MESSAGE = "Sorry, could not find any results.";
@@ -40,148 +40,117 @@ public class AppointmentController implements Initializable {
     private static final String CHANGE_CONFIRMATION = "Confirm changes?";
     private static final String DELETE_CONFIRMATION = "Are you sure you want to delete this appointment?";
     private static final String ADD_SUCCESS_MESSAGE = "Appointment successfully added.";
+    // Disables dates before current date for datepicker
+    final Callback<DatePicker, DateCell> dayCellFactory = new Callback<DatePicker, DateCell>() {
+        public DateCell call(final DatePicker datePicker) {
+            return new DateCell() {
+                @Override
+                public void updateItem(LocalDate item, boolean empty) {
+                    super.updateItem(item, empty);
+
+                    if (MonthDay.from(item).isBefore(MonthDay.now())) {
+                        setDisable(true);
+                    }
+                }
+            };
+        }
+    };
+    SceneChanger sceneChanger = new SceneChanger();
     boolean addListenerTriggered = false;
     boolean startDateChosen = false;
     boolean appointmentSelected = false;
-
     @FXML
     private Button addButton;
-
     @FXML
     private TableView<Appointment> allAppointmentsTableView;
-
     @FXML
     private Tab allTab;
-
     @FXML
     private TextField appointmentFilterTextField;
-
     @FXML
     private Label appointmentsLabel;
-
     @FXML
     private Button backButton;
-
     @FXML
     private Button clearButton;
-
     @FXML
     private ComboBox<String> contactComboBox;
-
     @FXML
     private Label contactLabel;
-
     @FXML
     private Tab currMonthTab;
-
     @FXML
     private TableView<Appointment> currMonthTableView;
-
     @FXML
     private Tab currWeekTab;
-
     @FXML
     private TableView<Appointment> currWeekTableView;
-
     @FXML
     private ComboBox<String> customerNameComboBox;
-
     @FXML
     private Label customerNameLabel;
-
     @FXML
     private Button deleteButton;
-
     @FXML
     private Label descriptionLabel;
-
     @FXML
     private TextField descriptionTextField;
-
     @FXML
     private Label endDateLabel;
-
     @FXML
     private DatePicker endDatePicker;
-
     @FXML
     private ComboBox<Integer> endHourComboBox;
-
     @FXML
     private Label endHourLabel;
-
     @FXML
     private Label endLabel;
-
     @FXML
     private ComboBox<String> endMinuteComboBox;
-
     @FXML
     private Label endMinuteLabel;
-
     @FXML
     private Label idLabel;
-
     @FXML
     private TextField idTextField;
-
     @FXML
     private Label locationLabel;
-
     @FXML
     private TextField locationTextField;
-
     @FXML
     private TextField titleTextField;
-
     @FXML
     private Button selectButton;
-
     @FXML
     private Label startDateLabel;
-
     @FXML
     private DatePicker startDatePicker;
-
     @FXML
     private ComboBox<Integer> startHourComboBox;
-
     @FXML
     private Label startHourLabel;
-
     @FXML
     private Label startLabel;
-
     @FXML
     private ComboBox<String> startMinuteComboBox;
-
     @FXML
     private Label startMinuteLabel;
-
     @FXML
     private TabPane tabPane;
-
     @FXML
     private Label titleLabel;
-
     @FXML
     private Label typeLabel;
-
     @FXML
     private TextField typeTextField;
-
     @FXML
     private Button updateButton;
-
     @FXML
     private ComboBox<String> userNameComboBox;
-
     @FXML
     private Label userNameLabel;
-
     @FXML
     private Button viewReportsButton;
-
 
     @FXML
     void onActionAddAppointment(ActionEvent event) {
@@ -245,7 +214,6 @@ public class AppointmentController implements Initializable {
     void onActionClearTextFields(ActionEvent event) throws SQLException {
 
         clearFields();
-        addButton.setDisable(false);
         appointmentSelected = false;
 
     }
@@ -263,6 +231,7 @@ public class AppointmentController implements Initializable {
         if (AlertPopups.receiveConfirmation("Delete", DELETE_CONFIRMATION)) {
             AppointmentAccess.executeDelete(appointmentId);
             fillAllAppointmentTables();
+            clearFields();
         }
 
     }
@@ -409,7 +378,6 @@ public class AppointmentController implements Initializable {
         sceneChanger.changeScreen(event, "Reports");
     }
 
-
     public void fillAppointmentTable(TableView table, ResultSet rs) {
 
         // checks whether table columns were already populated
@@ -453,7 +421,14 @@ public class AppointmentController implements Initializable {
         while (rs.next()) {
             ObservableList<String> row = FXCollections.observableArrayList();
             for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-                row.add(rs.getString(i));
+                if ((Objects.equals(rs.getMetaData().getColumnName(i), "Start")) ||
+                        (Objects.equals(rs.getMetaData().getColumnName(i), "End")) ||
+                        (Objects.equals(rs.getMetaData().getColumnName(i), "Create_Date")) ||
+                        (Objects.equals(rs.getMetaData().getColumnName(i), "Last_Update"))) {
+                    row.add(TimeHelper.dbStringToLocalString(rs.getString(i)));
+                } else {
+                    row.add(rs.getString(i));
+                }
             }
             data.add(row);
         }
@@ -470,7 +445,14 @@ public class AppointmentController implements Initializable {
             while (rs.next()) {
                 ObservableList<String> row = FXCollections.observableArrayList();
                 for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-                    row.add(rs.getString(i));
+                    if ((Objects.equals(rs.getMetaData().getColumnName(i), "Start")) ||
+                            (Objects.equals(rs.getMetaData().getColumnName(i), "End")) ||
+                            (Objects.equals(rs.getMetaData().getColumnName(i), "Create_Date")) ||
+                            (Objects.equals(rs.getMetaData().getColumnName(i), "Last_Update"))) {
+                        row.add(TimeHelper.dbStringToLocalString(rs.getString(i)));
+                    } else {
+                        row.add(rs.getString(i));
+                    }
                 }
                 data.add(row);
             }
@@ -523,21 +505,6 @@ public class AppointmentController implements Initializable {
         endMinuteComboBox.setValue(TimeHelper.getMinutesList().get(0));
 
     }
-
-    // Disables dates before current date for datepicker
-    final Callback<DatePicker, DateCell> dayCellFactory = new Callback<DatePicker, DateCell>() {
-        public DateCell call(final DatePicker datePicker) {
-            return new DateCell() {
-                @Override public void updateItem(LocalDate item, boolean empty) {
-                    super.updateItem(item, empty);
-
-                    if (MonthDay.from(item).isBefore(MonthDay.now())) {
-                        setDisable(true);
-                    }
-                }
-            };
-        }
-    };
 
     public void filterTable(String text) throws SQLException {
 
@@ -611,6 +578,8 @@ public class AppointmentController implements Initializable {
         customerNameComboBox.setItems(null);
         userNameComboBox.setItems(null);
         fillComboAndDates();
+
+        addButton.setDisable(false);
     }
 
 

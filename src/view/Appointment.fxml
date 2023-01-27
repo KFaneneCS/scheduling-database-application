@@ -17,9 +17,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="787.0" prefWidth="800.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AppointmentController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="778.0" prefWidth="800.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AppointmentController">
    <children>
-      <VBox layoutX="2.0" prefHeight="787.0" prefWidth="800.0">
+      <VBox layoutX="2.0" prefHeight="778.0" prefWidth="800.0">
          <children>
             <HBox alignment="CENTER_LEFT" prefHeight="93.0" prefWidth="800.0">
                <children>
@@ -270,18 +270,7 @@
             </HBox>
             <HBox alignment="BOTTOM_RIGHT" layoutX="10.0" layoutY="283.0" prefHeight="33.0" prefWidth="800.0">
                <children>
-                  <VBox alignment="BOTTOM_LEFT" prefHeight="33.0" prefWidth="457.0">
-                     <children>
-                        <Label text="(Note: Times are displayed in UTC in table)">
-                           <font>
-                              <Font name="System Italic" size="12.0" />
-                           </font>
-                           <VBox.margin>
-                              <Insets left="15.0" />
-                           </VBox.margin>
-                        </Label>
-                     </children>
-                  </VBox>
+                  <VBox alignment="BOTTOM_LEFT" prefHeight="33.0" prefWidth="457.0" />
                   <TextField fx:id="appointmentFilterTextField" onAction="#onActionFilterAppointments" prefHeight="25.0" prefWidth="211.0" promptText="Search by Appointment ID or Title">
                      <HBox.margin>
                         <Insets right="30.0" />
@@ -371,7 +360,6 @@
                   </GridPane>
                </children>
             </HBox>
-            <HBox alignment="TOP_RIGHT" prefHeight="42.0" prefWidth="800.0" />
          </children>
       </VBox>
    </children>

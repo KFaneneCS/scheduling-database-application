@@ -1,10 +1,1 @@
 
-User test successfully logged in at 2023-01-27 03:11:27 (UTC)
-User asdf gave invalid log-in at 2023-01-27 03:11:44 (UTC)
-User admin successfully logged in at 2023-01-27 03:11:51 (UTC)
-User fads gave invalid log-in at 2023-01-27 03:45:56 (UTC)
-User 1234 gave invalid log-in at 2023-01-27 03:46:02 (UTC)
-User nnnnnnn gave invalid log-in at 2023-01-27 03:46:05 (UTC)
-User test successfully logged in at 2023-01-27 03:48:06 (UTC)
-User asdfasdf gave invalid log-in at 2023-01-27 03:54:23 (UTC)
-User 123123 gave invalid log-in at 2023-01-27 03:54:37 (UTC)

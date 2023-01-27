@@ -1,6 +1,9 @@
 package controller;
 
-import DAO.*;
+import DAO.CountryAccess;
+import DAO.CustomerAccess;
+import DAO.CustomerQueries;
+import DAO.FLDAccess;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -10,27 +13,30 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.util.Callback;
-import model.*;
+import model.Customer;
 import utility.AlertPopups;
 import utility.SceneChanger;
+import utility.TimeHelper;
 
 import java.io.IOException;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class CustomerController implements Initializable {
 
     private final ObservableList<String> countriesList = FXCollections
             .observableArrayList("U.S", "UK", "Canada");
-    SceneChanger sceneChanger = new SceneChanger();
-    String GENERAL_ERROR_MESSAGE = "Sorry, there was an error.";
-    String EMPTY_ERROR_MESSAGE = "Sorry, all fields must be filled in.";
-    String NO_RESULTS_ERROR_MESSAGE = "Sorry, could not find any results.";
-    String SELECTION_ERROR_MESSAGE = "No customer was selected.";
-    String CHANGE_CONFIRMATION = "Confirm changes?";
-    String DELETE_CONFIRMATION = "Are you sure you wish to delete customer, including ALL associated appointments?";
+    private static final SceneChanger sceneChanger = new SceneChanger();
+    private static final String GENERAL_ERROR_MESSAGE = "Sorry, there was an error.";
+    private static final String EMPTY_ERROR_MESSAGE = "Sorry, all fields must be filled in.";
+    private static final String NO_RESULTS_ERROR_MESSAGE = "Sorry, could not find any results.";
+    private static final String SELECTION_ERROR_MESSAGE = "No customer was selected.";
+    private static final String CHANGE_CONFIRMATION = "Confirm changes?";
+    private static final String DELETE_CONFIRMATION = "Are you sure you wish to delete customer, including ALL associated appointments?";
+    private static final String ADD_SUCCESS_MESSAGE = "Customer successfully added.";
     boolean customerSelected = false;
 
     @FXML
@@ -124,11 +130,7 @@ public class CustomerController implements Initializable {
 
         CustomerAccess.executeAdd(name, address, postalCode, phone, divisionId);
         fillCustomerTable();
-
-//        CustomerAccess.addCustomer(rs);
-
-//        System.out.println("All customers count == " + CustomerAccess.allCustomers.size() +
-//                " which should be same as # of customers in database ==  " + customersTableView.getItems().size());
+        AlertPopups.generateInfoMessage("Add successful", ADD_SUCCESS_MESSAGE);
 
     }
 
@@ -151,7 +153,7 @@ public class CustomerController implements Initializable {
     @FXML
     void onActionDeleteCustomer(ActionEvent event) {
 
-        // TODO:  Haven't tested this yet!!!
+        System.out.println("TEST:  Total number of customers BEFORE delete = " + CustomerAccess.getAllCustomers().size());
         if (!customerSelected) {
             AlertPopups.generateErrorMessage(SELECTION_ERROR_MESSAGE);
         } else {
@@ -163,7 +165,7 @@ public class CustomerController implements Initializable {
                     int customerId = Integer.parseInt(idTextField.getText());
                     CustomerAccess.executeDelete(CustomerAccess.lookupCustomer(customerId));
                     fillCustomerTable();
-
+                    System.out.println("TEST:  Total number of customers AFTER delete = " + CustomerAccess.getAllCustomers().size());
 
                 }
             } catch (Exception e) {
@@ -301,7 +303,14 @@ public class CustomerController implements Initializable {
         while (rs.next()) {
             ObservableList<String> row = FXCollections.observableArrayList();
             for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-                row.add(rs.getString(i));
+                if ((Objects.equals(rs.getMetaData().getColumnName(i), "Start")) ||
+                        (Objects.equals(rs.getMetaData().getColumnName(i), "End")) ||
+                        (Objects.equals(rs.getMetaData().getColumnName(i), "Create_Date")) ||
+                        (Objects.equals(rs.getMetaData().getColumnName(i), "Last_Update"))) {
+                    row.add(TimeHelper.dbStringToLocalString(rs.getString(i)));
+                } else {
+                    row.add(rs.getString(i));
+                }
             }
             data.add(row);
         }
@@ -317,7 +326,14 @@ public class CustomerController implements Initializable {
             while (rs.next()) {
                 ObservableList<String> row = FXCollections.observableArrayList();
                 for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-                    row.add(rs.getString(i));
+                    if ((Objects.equals(rs.getMetaData().getColumnName(i), "Start")) ||
+                            (Objects.equals(rs.getMetaData().getColumnName(i), "End")) ||
+                            (Objects.equals(rs.getMetaData().getColumnName(i), "Create_Date")) ||
+                            (Objects.equals(rs.getMetaData().getColumnName(i), "Last_Update"))) {
+                        row.add(TimeHelper.dbStringToLocalString(rs.getString(i)));
+                    } else {
+                        row.add(rs.getString(i));
+                    }
                 }
                 data.add(row);
             }
