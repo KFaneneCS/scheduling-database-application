@@ -1,9 +1,6 @@
 package controller;
 
-import DAO.CountryAccess;
-import DAO.CustomerAccess;
 import DAO.CustomerQueries;
-import DAO.FLDAccess;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -116,6 +113,8 @@ public class CustomerController implements Initializable {
         String address = addressTextField.getText().strip();
         String postalCode = postalCodeTextField.getText().strip();
         String phone = phoneTextField.getText().strip();
+        String createdBy = UserAccess.getActiveUser();
+        String lastUpdatedBy = UserAccess.getActiveUser();
 
         if (name.isEmpty() || address.isEmpty() || postalCode.isEmpty() || phone.isEmpty()) {
             AlertPopups.generateErrorMessage(EMPTY_ERROR_MESSAGE);
@@ -128,7 +127,7 @@ public class CustomerController implements Initializable {
             return;
         }
 
-        CustomerAccess.executeAdd(name, address, postalCode, phone, divisionId);
+        CustomerAccess.executeAdd(name, address, postalCode, phone, createdBy, lastUpdatedBy, divisionId);
         fillCustomerTable();
         AlertPopups.generateInfoMessage("Add successful", ADD_SUCCESS_MESSAGE);
 
@@ -231,6 +230,7 @@ public class CustomerController implements Initializable {
             String address = addressTextField.getText().strip();
             String postalCode = postalCodeTextField.getText().strip();
             String phone = phoneTextField.getText().strip();
+            String lastUpdatedBy = UserAccess.getActiveUser();
 
             if (name.isEmpty() || address.isEmpty() || postalCode.isEmpty() || phone.isEmpty()) {
                 AlertPopups.generateErrorMessage(EMPTY_ERROR_MESSAGE);
@@ -244,7 +244,7 @@ public class CustomerController implements Initializable {
             }
 
             if (AlertPopups.receiveConfirmation("Confirm Update", CHANGE_CONFIRMATION)) {
-                if (CustomerQueries.updateCustomer(id, name, address, postalCode, phone, divisionId) == 1) {
+                if (CustomerQueries.updateCustomer(id, name, address, postalCode, phone, lastUpdatedBy, divisionId) == 1) {
                     fillCustomerTable();
                     ResultSet rs = CustomerQueries.selectCustomer(id);
                     while (rs.next()) {

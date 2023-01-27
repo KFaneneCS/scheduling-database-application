@@ -167,6 +167,8 @@ public class AppointmentController implements Initializable {
             LocalDate endLocalDate = endDatePicker.getValue();
             int endHour = endHourComboBox.getValue();
             String endMinute = endMinuteComboBox.getValue();
+            String createdBy = UserAccess.getActiveUser();
+            String lastUpdatedBy = UserAccess.getActiveUser();
             String customer = customerNameComboBox.getValue();
             String user = userNameComboBox.getValue();
 
@@ -194,7 +196,7 @@ public class AppointmentController implements Initializable {
             }
 
             AppointmentAccess.executeAdd(title, description, location, contactId,
-                    type, startZDT, endZDT, customerId, userId);
+                    type, startZDT, endZDT, createdBy, lastUpdatedBy, customerId, userId);
             fillAllAppointmentTables();
             AlertPopups.generateInfoMessage("Add successful", ADD_SUCCESS_MESSAGE);
             clearFields();
@@ -330,6 +332,7 @@ public class AppointmentController implements Initializable {
             LocalDate endLocalDate = endDatePicker.getValue();
             int endHour = endHourComboBox.getValue();
             String endMinute = endMinuteComboBox.getValue();
+            String lastUpdatedBy = UserAccess.getActiveUser();
             String customer = customerNameComboBox.getValue();
             String user = userNameComboBox.getValue();
 
@@ -357,7 +360,8 @@ public class AppointmentController implements Initializable {
             }
 
             if (AlertPopups.receiveConfirmation("Confirm Update", CHANGE_CONFIRMATION)) {
-                if (AppointmentQueries.updateAppointment(id, title, description, location, type, startZDT, endZDT, customerId, userId, contactId) == 1) {
+                if (AppointmentQueries.updateAppointment(id, title, description, location, type, startZDT, endZDT,
+                        lastUpdatedBy, customerId, userId, contactId) == 1) {
                     fillAllAppointmentTables();
                     ResultSet rs = AppointmentQueries.selectAppointmentByTable(id, 1);
                     while (rs.next()) {

@@ -18,12 +18,12 @@ public class AppointmentQueries {
 
     private static final String GENERAL_ERROR_MESSAGE = "Sorry, there was an error.";
 
-    public static int insertAppointment(String ti, String d, String l, String ty, ZonedDateTime start,
-                                        ZonedDateTime end, int custId, int userId, int contId) {
+    public static int insertAppointment(String ti, String d, String l, String ty, ZonedDateTime start, ZonedDateTime end,
+                                        String cBy, String luBy, int custId, int userId, int contId) {
         try {
             String sql = "INSERT INTO client_schedule.appointments (Title, Description, Location, Type, Start, End, " +
                     "Create_Date, Created_By, Last_Update, Last_Updated_By, Customer_ID, User_ID, Contact_ID) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, NOW(), 'script', NOW(), 'script', ?, ?, ?)";
+                    "VALUES (?, ?, ?, ?, ?, ?, NOW(), ?, NOW(), ?, ?, ?, ?)";
             PreparedStatement ps = JDBC.connection.prepareStatement(sql);
             ps.setString(1, ti);
             ps.setString(2, d);
@@ -31,9 +31,11 @@ public class AppointmentQueries {
             ps.setString(4, ty);
             ps.setString(5, TimeHelper.zdtToString(start));
             ps.setString(6, TimeHelper.zdtToString(end));
-            ps.setInt(7, custId);
-            ps.setInt(8, userId);
-            ps.setInt(9, contId);
+            ps.setString(7, cBy);
+            ps.setString(8, luBy);
+            ps.setInt(9, custId);
+            ps.setInt(10, userId);
+            ps.setInt(11, contId);
             return ps.executeUpdate();
         } catch (Exception e) {
             AlertPopups.generateErrorMessage(GENERAL_ERROR_MESSAGE);
@@ -128,11 +130,11 @@ public class AppointmentQueries {
     }
 
     public static int updateAppointment(int apptId, String title, String description, String location,
-                                        String type, ZonedDateTime startZDT, ZonedDateTime endZDT,
+                                        String type, ZonedDateTime startZDT, ZonedDateTime endZDT, String lastUpdatedBy,
                                         int customerId, int userId, int contactID) throws SQLException {
         String sql = "UPDATE client_schedule.appointments SET " +
-                "Title = ?, Description = ?, Location = ?, Type = ?, Start = ?, End = ?, " +
-                "Last_Update = NOW(), Customer_ID = ?, User_ID = ?, Contact_ID = ? WHERE Appointment_ID = ?";
+                "Title = ?, Description = ?, Location = ?, Type = ?, Start = ?, End = ?, Last_Update = NOW(), " +
+                "Last_Updated_By = ?, Customer_ID = ?, User_ID = ?, Contact_ID = ? WHERE Appointment_ID = ?";
         PreparedStatement ps = JDBC.connection.prepareStatement(sql);
         ps.setString(1, title);
         ps.setString(2, description);
@@ -140,10 +142,11 @@ public class AppointmentQueries {
         ps.setString(4, type);
         ps.setString(5, TimeHelper.zdtToString(startZDT));
         ps.setString(6, TimeHelper.zdtToString(endZDT));
-        ps.setInt(7, customerId);
-        ps.setInt(8, userId);
-        ps.setInt(9, contactID);
-        ps.setInt(10, apptId);
+        ps.setString(7, lastUpdatedBy);
+        ps.setInt(8, customerId);
+        ps.setInt(9, userId);
+        ps.setInt(10, contactID);
+        ps.setInt(11, apptId);
         return ps.executeUpdate();
     }
 

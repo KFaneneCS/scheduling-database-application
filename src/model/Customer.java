@@ -1,7 +1,7 @@
 package model;
 
-import DAO.CountryAccess;
-import DAO.FLDAccess;
+import controller.CountryAccess;
+import controller.FLDAccess;
 import utility.TimeHelper;
 
 import java.time.ZonedDateTime;

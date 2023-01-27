@@ -1,5 +1,6 @@
-package DAO;
+package controller;
 
+import DAO.AppointmentQueries;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.Appointment;
@@ -109,11 +110,11 @@ public class AppointmentAccess {
     }
 
     public static void executeAdd(String title, String description, String location, int contactId,
-                                  String type, ZonedDateTime startZDT, ZonedDateTime endZDT, int customerId,
-                                  int userId) throws SQLException {
+                                  String type, ZonedDateTime startZDT, ZonedDateTime endZDT, String createdBy,
+                                  String lastUpdatedBy, int customerId, int userId) throws SQLException {
 
-        if (AppointmentQueries.insertAppointment(title, description, location, type, startZDT, endZDT,
-                customerId, userId, contactId) < 1) {
+        if (AppointmentQueries.insertAppointment(title, description, location, type, startZDT, endZDT, createdBy,
+                lastUpdatedBy, customerId, userId, contactId) < 1) {
             AlertPopups.generateErrorMessage(ERROR_MESSAGE);
         } else {
             ResultSet rs = AppointmentQueries.selectAppointmentByTable(title, description, startZDT);

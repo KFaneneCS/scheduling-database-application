@@ -1,6 +1,6 @@
 package utility;
 
-import DAO.AppointmentAccess;
+import controller.AppointmentAccess;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.Appointment;
@@ -14,8 +14,7 @@ public class TimeHelper {
 
     private static final DateTimeFormatter STANDARD_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final ObservableList<Integer> hoursList = FXCollections.observableArrayList();
-    private static final ObservableList<String> minutesList =
-            FXCollections.observableArrayList("00", "15", "30", "45");
+    private static final ObservableList<String> minutesList = FXCollections.observableArrayList("00", "15", "30", "45");
 
 
     public static ObservableList<Integer> getHoursList() {
@@ -131,8 +130,7 @@ public class TimeHelper {
         return false;
     }
 
-    public static boolean updateHasOverlap(int customerId, int appointmentId,
-                                           ZonedDateTime checkStart, ZonedDateTime checkEnd) {
+    public static boolean updateHasOverlap(int customerId, int appointmentId, ZonedDateTime checkStart, ZonedDateTime checkEnd) {
 
         for (Appointment appointment : AppointmentAccess.getAllAppointments()) {
 

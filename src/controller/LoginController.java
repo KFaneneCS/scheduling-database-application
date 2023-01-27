@@ -91,6 +91,7 @@ public class LoginController implements Initializable {
                         AlertPopups.generateUpcomingApptMessage(null);
                     }
                     outputFile.close();
+                    UserAccess.setActiveUser(user);
                     return true;
 
                 } else {

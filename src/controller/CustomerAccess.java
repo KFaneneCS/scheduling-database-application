@@ -1,5 +1,6 @@
-package DAO;
+package controller;
 
+import DAO.CustomerQueries;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.Appointment;
@@ -159,10 +160,10 @@ public class CustomerAccess {
         return associatedAppointments;
     }
 
-    public static void executeAdd(String name, String address, String postalCode,
-                                  String phone, int divId) throws SQLException {
+    public static void executeAdd(String name, String address, String postalCode, String phone, String createdBy,
+                                  String lastUpdatedBy, int divId) throws SQLException {
 
-        if (CustomerQueries.insertCustomer(name, address, postalCode, phone, divId) < 1) {
+        if (CustomerQueries.insertCustomer(name, address, postalCode, phone, createdBy, lastUpdatedBy, divId) < 1) {
             AlertPopups.generateErrorMessage(ERROR_MESSAGE);
         } else {
             ResultSet rs = CustomerQueries.selectCustomer(name, address);

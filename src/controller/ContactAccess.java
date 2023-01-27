@@ -1,5 +1,6 @@
-package DAO;
+package controller;
 
+import DAO.ContactQueries;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.Contact;

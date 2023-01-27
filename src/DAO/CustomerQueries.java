@@ -12,17 +12,19 @@ public class CustomerQueries {
     public static final String GENERAL_ERROR_MESSAGE = "Sorry, there was an error.";
 
     public static int insertCustomer(String n, String a, String pc,
-                                     String ph, int d) {
+                                     String ph, String cB, String luB, int d) {
         try {
             String sql = "INSERT INTO customers (Customer_Name, Address, Postal_Code, Phone, " +
                     "Create_Date, Created_By, Last_Update, Last_Updated_By, Division_ID) " +
-                    "VALUES (?, ?, ?, ?, NOW(), 'script', NOW(), 'script', ?)";
+                    "VALUES (?, ?, ?, ?, NOW(), ?, NOW(), ?, ?)";
             PreparedStatement ps = JDBC.connection.prepareStatement(sql);
             ps.setString(1, n);
             ps.setString(2, a);
             ps.setString(3, pc);
             ps.setString(4, ph);
-            ps.setInt(5, d);
+            ps.setString(5, cB);
+            ps.setString(6, luB);
+            ps.setInt(7, d);
             return ps.executeUpdate();
         } catch (Exception e) {
             AlertPopups.generateErrorMessage(GENERAL_ERROR_MESSAGE);
@@ -32,19 +34,20 @@ public class CustomerQueries {
     }
 
     public static int updateCustomer(int cusId, String name, String address, String postalCode,
-                                     String phone, int divId) throws SQLException {
+                                     String phone, String lastUpdatedBy, int divId) throws SQLException {
 
         String sql = "UPDATE customers SET " +
                 "Customer_Name = ?, Address = ?, Postal_Code = ?, " +
-                "Phone = ?, Last_Update = NOW(), Division_ID = ? " +
+                "Phone = ?, Last_Update = NOW(), Last_Updated_By = ?, Division_ID = ? " +
                 "WHERE Customer_ID = ?";
         PreparedStatement ps = JDBC.connection.prepareStatement(sql);
         ps.setString(1, name);
         ps.setString(2, address);
         ps.setString(3, postalCode);
         ps.setString(4, phone);
-        ps.setInt(5, divId);
-        ps.setInt(6, cusId);
+        ps.setString(5, lastUpdatedBy);
+        ps.setInt(6, divId);
+        ps.setInt(7, cusId);
         return ps.executeUpdate();
 
     }

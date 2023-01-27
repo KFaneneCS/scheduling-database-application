@@ -1,5 +1,6 @@
-package DAO;
+package controller;
 
+import DAO.UserQueries;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.User;
@@ -12,10 +13,19 @@ import java.util.Objects;
 public class UserAccess {
 
     private static final String ERROR_MESSAGE = "Sorry, there was an error.";
-    public static final ObservableList<User> allUsers = FXCollections.observableArrayList();
+    private static final ObservableList<User> allUsers = FXCollections.observableArrayList();
+    private static User activeUser;
 
     public static ObservableList<User> getAllUsers() {
         return allUsers;
+    }
+
+    public static String getActiveUser() {
+        return activeUser.getName();
+    }
+
+    public static void setActiveUser(User user) {
+        activeUser = user;
     }
 
     public static void initializeUsers() {
