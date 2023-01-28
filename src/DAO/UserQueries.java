@@ -1,25 +1,20 @@
 package DAO;
 
-import utility.JDBC;
-
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * Data access class that holds single database query method pertaining to the User class.
+ *
+ * @author Kyle Fanene
+ */
 public class UserQueries {
 
-    public static int convertToUserId(String username) throws SQLException {
-        String sql = "SELECT * FROM users WHERE User_Name = ?";
-        PreparedStatement ps = JDBC.connection.prepareStatement(sql);
-        ps.setString(1, username);
-        ResultSet rs = ps.executeQuery();
-
-        while (rs.next()) {
-            return rs.getInt("User_ID");
-        }
-        return -1;
-    }
-
+    /**
+     * Method that queries the database to select all from the users table.
+     *
+     * @return Returns the ResultSet from selecting all customers query.
+     */
     public static ResultSet selectAllUsers() throws SQLException {
         String sql = "SELECT * FROM client_schedule.users";
         return JDBC.connection.createStatement().executeQuery(sql);

@@ -1,6 +1,6 @@
 package controller;
 
-import DAO.CustomerQueries;
+import DAO.*;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -259,11 +259,23 @@ public class CustomerController implements Initializable {
         filterTable(searchText);
     }
 
+    /**
+     * Calls method which populates state/province combo box depending on country chosen.
+     *
+     * @param event User selects country from country combo box.
+     */
     @FXML
     void onActionPopulateStateProvince(ActionEvent event) throws SQLException {
         fillStateProvinceComboBox();
     }
 
+    /**
+     * Updates customer object and applicable information in database for selected customer.
+     * <p>
+     * Logical validations check that a customer was selected and fields are not left empty.
+     *
+     * @param event Button to update customer.
+     */
     @FXML
     void onActionUpdateCustomer(ActionEvent event) throws SQLException {
 
@@ -305,6 +317,11 @@ public class CustomerController implements Initializable {
         }
     }
 
+    /**
+     * Method that sets up customer TableView columns corresponding to customer table in database.
+     * "populated" boolean ensure columns are not populated multiple times.  Calls refreshTable()
+     * method to fill rows.
+     */
     public void fillCustomerTable() {
 
         // checks whether table columns were already populated
@@ -341,6 +358,14 @@ public class CustomerController implements Initializable {
         }
     }
 
+    /**
+     * Overloaded method that takes rows of data from database per passed ResultSet and populates the
+     * customer table accordingly.  All DateTimes are converted from UTC to user's local time
+     * zone.
+     *
+     * @param rs    The ResultSet from a database select query that pulls the relevant
+     *              database table information.
+     */
     public void refreshTable(ResultSet rs) throws SQLException {
 
         ObservableList<ObservableList> data = FXCollections.observableArrayList();
@@ -363,6 +388,14 @@ public class CustomerController implements Initializable {
         customersTableView.setItems(data);
     }
 
+    /**
+     * Overloaded method that takes ObservableList of ResultSets stemming from multiple
+     * SELECT-FROM-WHERE queries and filters the customer accordingly.  All
+     * DateTimes are converted from UTC to user's local time zone.
+     *
+     * @param rsList    The ResultSet ObservableList from database select queries that pull the relevant
+     *                  database table information to filter the customer table.
+     */
     public void refreshTable(ObservableList<ResultSet> rsList) throws SQLException {
 
         ObservableList<ObservableList> data = FXCollections.observableArrayList();
@@ -387,6 +420,10 @@ public class CustomerController implements Initializable {
         customersTableView.setItems(data);
     }
 
+    /**
+     * Fills state/province combo box corresponding to the country chosen by user.  Ensures
+     * referential integrity between first-level divisions and countries.
+     */
     public void fillStateProvinceComboBox() throws SQLException {
         String country = countryComboBox.getValue();
         int countryId = CountryAccess.lookupCountryId(country);
@@ -395,6 +432,14 @@ public class CustomerController implements Initializable {
         stateProvinceComboBox.setValue(fldList.get(0));
     }
 
+    /**
+     * Filters customer table by String provided in the "Search by" text field. Method
+     * will first check if user provided an integer, in which case it will search by
+     * customer ID.  Otherwise, it will search by customer name. If no results are found,
+     * an error alert will pop up.
+     *
+     * @param text  The text input from user.
+     */
     public void filterTable(String text) throws SQLException {
 
         ObservableList<ResultSet> rsList = FXCollections.observableArrayList();
@@ -429,7 +474,14 @@ public class CustomerController implements Initializable {
 
     }
 
-
+    /**
+     * Initializes the Customer controller class. Populates default data for combo boxes and tables.
+     *
+     * @param url            Per Initializable javadoc reference: "The location used to resolve relative
+     *                       paths for the root object, or null if the location is not known."
+     * @param resourceBundle Per Initializable javadoc reference: "The resources used to
+     *                       localize the root object, or null if the root object was not localized."
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 

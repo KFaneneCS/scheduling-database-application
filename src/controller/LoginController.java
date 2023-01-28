@@ -27,6 +27,14 @@ import java.util.TimeZone;
 
 import static translation.Translation.translate;
 
+/**
+ * Controller class which provides control logic for the components of the Login screen.  User login
+ * information is validated, and all user attempts are logged (successful and unsuccessful) in a txt
+ * file titled "login_activity". Username and corresponding passwords are matched against the database
+ * user table.
+ *
+ * @author Kyle Fanene
+ */
 public class LoginController implements Initializable {
 
     private static final String GENERAL_ERROR_MESSAGE = "Sorry, there was an error.";
@@ -48,9 +56,18 @@ public class LoginController implements Initializable {
     @FXML
     private TextField usernameTextField;
 
+    /**
+     * Constructor that throws IOException to avoid unhandled exception stemming from FileWriter class.
+     */
     public LoginController() throws IOException {
     }
 
+    /**
+     * Attempts login by calling executeLoginAttempt().  If successful, changes screen to Welcome screen.
+     * Otherwise, a validation error is shown to user.  All login attempts are logged.
+     *
+     * @param event Button to add customer.  Disabled when a customer is selected for update or deletion.
+     */
     @FXML
     void onActionLogin(ActionEvent event) {
 
@@ -64,13 +81,18 @@ public class LoginController implements Initializable {
         }
     }
 
-
+    /**
+     * Boolean method that provides main logic for login attempts. All user login attempts are logged.
+     *
+     * @return Returns true if login is successful, otherwise returns false.
+     *
+     */
     public boolean executeLoginAttempt() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss (z)");
         String now = ZonedDateTime.now().withZoneSameInstant(ZoneId.of("UTC")).format(formatter);
         String loginUsername = usernameTextField.getText();
         try {
-            int userId = UserQueries.convertToUserId(loginUsername);
+            int userId = UserAccess.lookupUserId(loginUsername);
             User user = UserAccess.lookupUser(userId);
             if (user == null) {
                 // login NOT successful
@@ -83,8 +105,8 @@ public class LoginController implements Initializable {
                     // login successful
                     try {
                         outputFile.println("User " + loginUsername + " successfully logged in at " + now);
-                        TimeHelper.checkUpcomingAppointment(user);
-                        Appointment assocAppt = TimeHelper.checkUpcomingAppointment(user);
+                        AppointmentAccess.checkUpcomingAppointment(user);
+                        Appointment assocAppt = AppointmentAccess.checkUpcomingAppointment(user);
                         AlertPopups.generateUpcomingApptMessage(assocAppt);
                     } catch (NullPointerException npe) {
                         AlertPopups.generateUpcomingApptMessage(null);
@@ -107,6 +129,20 @@ public class LoginController implements Initializable {
         return false;
     }
 
+    /**
+     * Initializes the Login controller class.  Also initializes all data used in program, including class
+     * objects.
+     * <p>
+     * Two lambda expressions are used, each of which checks for whether user pressed Enter while text cursor
+     * is active in username or password text fields.  This allows for a better user experience by giving
+     * the user the option to complete login attempt without having to click the Login button.  The code itself
+     * is concise and clear and is a strategic use of lambda expressions.
+     *
+     * @param url            Per Initializable javadoc reference: "The location used to resolve relative
+     *                       paths for the root object, or null if the location is not known."
+     * @param resourceBundle Per Initializable javadoc reference: "The resources used to
+     *                       localize the root object, or null if the root object was not localized."
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -118,6 +154,7 @@ public class LoginController implements Initializable {
         passwordField.setPromptText(translate(passwordField.getPromptText()));
         loginButton.setText(translate(loginButton.getText()));
 
+        // Lambda expression used to check for Enter pressed on username text field
         usernameTextField.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER) {
                 try {
@@ -131,6 +168,7 @@ public class LoginController implements Initializable {
             }
         });
 
+        // Lambda expression used to check for Enter pressed on password text field
         passwordField.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER) {
                 try {

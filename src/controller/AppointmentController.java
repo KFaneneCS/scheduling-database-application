@@ -321,7 +321,7 @@ public class AppointmentController implements Initializable {
             titleTextField.setText(appointment.getTitle());
             descriptionTextField.setText(appointment.getDescription());
             locationTextField.setText(appointment.getLocation());
-            contactComboBox.setValue(ContactAccess.lookupContactId(appointment.getContactId()).getName());
+            contactComboBox.setValue(ContactAccess.lookupContact(appointment.getContactId()).getName());
             typeTextField.setText(appointment.getType());
             startDatePicker.setValue(appointment.getStart().toLocalDate());
             startHourComboBox.setValue(appointment.getStart().getHour());
@@ -447,7 +447,7 @@ public class AppointmentController implements Initializable {
 
     /**
      * Method that sets up selected TableView with columns and rows corresponding
-     * to the applicable database table per the passed ResultSet.  "Populated" boolean ensures
+     * to the applicable database table per the passed ResultSet.  "populated" boolean ensures
      * columns are not populated multiple times.  Calls refreshTable() method to fill rows.
      *
      * @param table The desired table to set up/populate from the three available
@@ -526,7 +526,7 @@ public class AppointmentController implements Initializable {
     /**
      * Overloaded method that takes ObservableList of ResultSets stemming from multiple
      * SELECT-FROM-WHERE queries and filters the desired table accordingly.  All
-     * DateTimes are converted from UTC to user's local tim zone.
+     * DateTimes are converted from UTC to user's local time zone.
      *
      * @param table     The desired table to set up/populate from the three available
      *                  ("All", "Current Month", "Current Week").
@@ -700,7 +700,7 @@ public class AppointmentController implements Initializable {
     }
 
     /**
-     * Initializes the Appointment controller class. Populates combo boxes, dates, and tables.
+     * Initializes the Appointment controller class. Populates default data for combo boxes, dates, and tables.
      * <p>
      * Three lambda expressions are used, each being a listener.  The first sets the end date to equal
      * start date once start date is chosen. This is because no appointment can last more than 14 hours

@@ -11,9 +11,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.util.Callback;
 import model.Contact;
-import model.ContactAccess;
+import DAO.ContactAccess;
 import model.Country;
-import model.CountryAccess;
+import DAO.CountryAccess;
 import utility.AlertPopups;
 import utility.SceneChanger;
 import utility.TimeHelper;
@@ -26,15 +26,22 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+/**
+ * Controller class which provides control logic for the various components of the Reports screen.  The three
+ * reports options are: 1) calculating total number customers by appointment date and type; 2) providing
+ * schedule information in a table for each customer; and 3) calculating total number of customers by
+ * country.
+ *
+ * @author Kyle Fanene
+ */
 public class ReportsController implements Initializable {
 
-    String GENERAL_ERROR_MESSAGE = "Sorry, there was an error.";
+    private static final String GENERAL_ERROR_MESSAGE = "Sorry, there was an error.";
+    private static final ObservableList<Integer> yearsList = FXCollections.observableArrayList();
+    private static final ObservableList<Integer> monthsList = FXCollections.observableArrayList();
+    private static final ObservableList<String> contactsList = FXCollections.observableArrayList();
+    private static final ObservableList<String> countriesList = FXCollections.observableArrayList();
     SceneChanger sceneChanger = new SceneChanger();
-    ObservableList<Integer> yearsList = FXCollections.observableArrayList();
-    ObservableList<Integer> monthsList = FXCollections.observableArrayList();
-    ObservableList<String> typesList = FXCollections.observableArrayList();
-    ObservableList<String> contactsList = FXCollections.observableArrayList();
-    ObservableList<String> countriesList = FXCollections.observableArrayList();
     boolean isReset = false;
 
     @FXML
@@ -67,6 +74,13 @@ public class ReportsController implements Initializable {
     @FXML
     private ComboBox<Integer> yearComboBox;
 
+    /**
+     * Calculates total number of customers by appointment date and type. Boolean "isReset" checks
+     * if combo boxes have previously had values picked so that the ActionEvent will be properly
+     * observed.
+     *
+     * @param event User chooses a type from the type combo box.
+     */
     @FXML
     void onActionCalcTotalByAppt(ActionEvent event) throws SQLException {
 
@@ -80,6 +94,11 @@ public class ReportsController implements Initializable {
         }
     }
 
+    /**
+     * Calculates total number of customers by country of origin.
+     *
+     * @param event User chooses a country from the country combo box.
+     */
     @FXML
     void onActionCalcTotalByCountry(ActionEvent event) throws SQLException {
 
@@ -87,6 +106,13 @@ public class ReportsController implements Initializable {
         totalByCountryTextField.setText(String.valueOf(ReportsQueries.selectTotalByCountry(country)));
     }
 
+    /**
+     * Enables the month combo box if it is not currently disabled, otherwise it will clear month combo box,
+     * type combo box, and total text field, which allows for proper activation of onActionCalcTotalByAppt's
+     * event.
+     *
+     * @param event User chooses a year from the year combo box.
+     */
     @FXML
     void onActionEnableMonth(ActionEvent event) {
 
@@ -103,6 +129,12 @@ public class ReportsController implements Initializable {
         }
     }
 
+    /**
+     * Enables type combo box when month is chosen unless month value is determined as part of
+     * onActionEnableMonth method.
+     *
+     * @param event User chooses a month from the month combo box.
+     */
     @FXML
     void onActionEnableType(ActionEvent event) {
 
@@ -117,6 +149,11 @@ public class ReportsController implements Initializable {
         }
     }
 
+    /**
+     * Fetches Contact ID of user's chosen contact and displays contact's schedule information in table.
+     *
+     * @param event User chooses contact from contact combo box.
+     */
     @FXML
     void onActionPopulateTable(ActionEvent event) throws SQLException {
 
@@ -125,6 +162,12 @@ public class ReportsController implements Initializable {
         fillContactScheduleTable(rs);
     }
 
+    /**
+     * Main logic handling the population of contact schedule table.  DateTimes are displayed in user's
+     * local time.
+     *
+     * @param rs ResultSet from SELECT query that gets relevant contact information from database.
+     */
     public void fillContactScheduleTable(ResultSet rs) {
 
         // checks whether table columns were already populated
@@ -175,6 +218,20 @@ public class ReportsController implements Initializable {
         }
     }
 
+    /**
+     * Initializes the Reports controller class. Data is initialized for ObservableLists that are used
+     * for years, months, appointment types, contacts, and countries combo boxes.
+     * <p>
+     * Lambda expression used on Back button that changes screen to Appointments screen.  The purpose of
+     * this lambda expression is to compare it with the standard onAction methods used for Back buttons
+     * in the Customer and Appointment controllers.  It demonstrates the options to the developer regarding
+     * the use of JavaFX controls.
+     *
+     * @param url            Per Initializable javadoc reference: "The location used to resolve relative
+     *                       paths for the root object, or null if the location is not known."
+     * @param resourceBundle Per Initializable javadoc reference: "The resources used to
+     *                       localize the root object, or null if the root object was not localized."
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -195,7 +252,7 @@ public class ReportsController implements Initializable {
 
         // fill list of appointment types
         try {
-            typesList = ReportsQueries.selectDistinctTypes();
+            ObservableList<String> typesList = ReportsQueries.selectDistinctTypes();
             typeComboBox.setItems(typesList);
         } catch (SQLException e) {
             AlertPopups.generateErrorMessage(GENERAL_ERROR_MESSAGE);
