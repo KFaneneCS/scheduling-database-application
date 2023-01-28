@@ -1,4 +1,4 @@
-package controller;
+package model;
 
 import DAO.FLDQueries;
 import javafx.collections.FXCollections;

@@ -10,10 +10,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.util.Callback;
-import model.Appointment;
-import model.Contact;
-import model.Customer;
-import model.User;
+import model.*;
 import utility.AlertPopups;
 import utility.SceneChanger;
 import utility.TimeHelper;
@@ -28,6 +25,16 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+/**
+ * Controller class which provides control logic for the various components of the Appointments screen, including: adding,
+ * updating, selecting, and deleting appointments; viewing all, current month, and current week appointments in a table
+ * that directly corresponds to the applicable appointments table from the database (except that date/times are
+ * displayed in user's local time); filtering said table by ID or Title; and viewing three relevant reports in a
+ * separate form.  Appointments are added to, updated to, and deleted from both the database and their corresponding
+ * Appointment objects.
+ *
+ * @author Kyle Fanene
+ */
 public class AppointmentController implements Initializable {
 
     private static final String GENERAL_ERROR_MESSAGE = "Sorry, there was an error.";
@@ -41,20 +48,6 @@ public class AppointmentController implements Initializable {
     private static final String DELETE_CONFIRMATION = "Are you sure you want to delete this appointment?";
     private static final String ADD_SUCCESS_MESSAGE = "Appointment successfully added.";
     // Disables dates before current date for datepicker
-    final Callback<DatePicker, DateCell> dayCellFactory = new Callback<DatePicker, DateCell>() {
-        public DateCell call(final DatePicker datePicker) {
-            return new DateCell() {
-                @Override
-                public void updateItem(LocalDate item, boolean empty) {
-                    super.updateItem(item, empty);
-
-                    if (MonthDay.from(item).isBefore(MonthDay.now())) {
-                        setDisable(true);
-                    }
-                }
-            };
-        }
-    };
     SceneChanger sceneChanger = new SceneChanger();
     boolean addListenerTriggered = false;
     boolean startDateChosen = false;
@@ -152,6 +145,13 @@ public class AppointmentController implements Initializable {
     @FXML
     private Button viewReportsButton;
 
+    /**
+     * Adds appointment object and inserts information into database per user's input.
+     * <p>
+     * Logical validations are included to prevent empty fields or non-sequential time inputs.
+     *
+     * @param event Button to add appointment.  Disabled when an appointment is selected for update or deletion.
+     */
     @FXML
     void onActionAddAppointment(ActionEvent event) {
 
@@ -212,6 +212,13 @@ public class AppointmentController implements Initializable {
 
     }
 
+    /**
+     * Clears text fields and resets all combo boxes.
+     * <p>
+     * Sets appointmentSelected boolean to false.
+     *
+     * @param event Button to clear fields/combo boxes.
+     */
     @FXML
     void onActionClearTextFields(ActionEvent event) throws SQLException {
 
@@ -220,6 +227,13 @@ public class AppointmentController implements Initializable {
 
     }
 
+    /**
+     * Removes selected appointment object and deletes information from database.
+     * <p>
+     * Logical validation checks that an appointment was selected.
+     *
+     * @param event Button to delete appointment.
+     */
     @FXML
     void onActionDeleteAppointment(ActionEvent event) throws SQLException {
 
@@ -238,17 +252,34 @@ public class AppointmentController implements Initializable {
 
     }
 
+    /**
+     * Changes screen to home (Welcome).
+     *
+     * @param event Back button, which returns to home screen.
+     */
     @FXML
     void onActionDisplayWelcome(ActionEvent event) throws IOException {
         sceneChanger.changeScreen(event, "Welcome");
     }
 
+    /**
+     * Filters selected appointment table by Appointment ID or Title.
+     *
+     * @param event Filter text field when user presses Enter.
+     */
     @FXML
     void onActionFilterAppointments(ActionEvent event) throws SQLException {
         String searchText = appointmentFilterTextField.getText();
         filterTable(searchText);
     }
 
+    /**
+     * Populates text fields, DatePickers, and combo boxes with selected appointment's information.
+     * <p>
+     * Logical validation checks that an appointment was selected.
+     *
+     * @param event Button to select appointment.
+     */
     @FXML
     void onActionSelectAppointment(ActionEvent event) {
 
@@ -313,6 +344,14 @@ public class AppointmentController implements Initializable {
         }
     }
 
+    /**
+     * Updates appointment object and applicable information in database for selected appointment.
+     * <p>
+     * Logical validations check that an appointment was selected, fields are not left empty, and
+     * times are sequential.
+     *
+     * @param event Button to update appointment.
+     */
     @FXML
     void onActionUpdateAppointment(ActionEvent event) throws SQLException {
 
@@ -377,11 +416,45 @@ public class AppointmentController implements Initializable {
         }
     }
 
+    /**
+     * Changes screen to Reports page.
+     *
+     * @param event View Reports button pressed.
+     */
     @FXML
     void onActionViewReports(ActionEvent event) throws IOException {
         sceneChanger.changeScreen(event, "Reports");
     }
 
+    /**
+     * dayCellFactory allows for the desired formatting of the Start DatePicker such that dates prior to the current
+     * date are disabled.
+     */
+    final Callback<DatePicker, DateCell> dayCellFactory = new Callback<DatePicker, DateCell>() {
+        public DateCell call(final DatePicker datePicker) {
+            return new DateCell() {
+                @Override
+                public void updateItem(LocalDate item, boolean empty) {
+                    super.updateItem(item, empty);
+
+                    if (MonthDay.from(item).isBefore(MonthDay.now())) {
+                        setDisable(true);
+                    }
+                }
+            };
+        }
+    };
+
+    /**
+     * Method that sets up selected TableView with columns and rows corresponding
+     * to the applicable database table per the passed ResultSet.  "Populated" boolean ensures
+     * columns are not populated multiple times.  Calls refreshTable() method to fill rows.
+     *
+     * @param table The desired table to set up/populate from the three available
+     *              ("All", "Current Month", "Current Week").
+     * @param rs    The ResultSet from a database select query that pulls the relevant
+     *              database table information.
+     */
     public void fillAppointmentTable(TableView table, ResultSet rs) {
 
         // checks whether table columns were already populated
@@ -416,6 +489,16 @@ public class AppointmentController implements Initializable {
         }
     }
 
+    /**
+     * Overloaded method that takes rows of data from database per passed ResultSet and populates the
+     * desired table accordingly.  All DateTimes are converted from UTC to user's local time
+     * zone.
+     *
+     * @param table The desired table to set up/populate from the three available
+     *              ("All", "Current Month", "Current Week").
+     * @param rs    The ResultSet from a database select query that pulls the relevant
+     *              database table information.
+     */
     public void refreshTable(TableView table, ResultSet rs) throws SQLException {
 
 
@@ -440,6 +523,16 @@ public class AppointmentController implements Initializable {
         table.setItems(data);
     }
 
+    /**
+     * Overloaded method that takes ObservableList of ResultSets stemming from multiple
+     * SELECT-FROM-WHERE queries and filters the desired table accordingly.  All
+     * DateTimes are converted from UTC to user's local tim zone.
+     *
+     * @param table     The desired table to set up/populate from the three available
+     *                  ("All", "Current Month", "Current Week").
+     * @param rsList    The ResultSet ObservableList from database select queries that pull the relevant
+     *                  database table information to filter the applicable table.
+     */
     public void refreshTable(TableView table, ObservableList<ResultSet> rsList) throws SQLException {
 
         ObservableList<ObservableList> data = FXCollections.observableArrayList();
@@ -465,7 +558,11 @@ public class AppointmentController implements Initializable {
 
     }
 
-    public void fillComboAndDates() throws SQLException {
+    /**
+     * Populates Contact, Customer, and User combo boxes using applicable ObservableLists.
+     * Also sets up DatePicker and Hour and Minute combo boxes to default values.
+     */
+    public void fillComboAndDates() {
 
         ObservableList<String> contactList = FXCollections.observableArrayList();
         ObservableList<String> customerList = FXCollections.observableArrayList();
@@ -495,8 +592,6 @@ public class AppointmentController implements Initializable {
 
         // Dates, hours, and minutes
         startDatePicker.setDayCellFactory(dayCellFactory);
-//        startDatePicker.setValue(LocalDate.now());
-//        endDatePicker.setValue(LocalDate.now());
 
         startHourComboBox.setItems(TimeHelper.getHoursList());
         startHourComboBox.setValue(TimeHelper.getHoursList().get(0));
@@ -510,6 +605,14 @@ public class AppointmentController implements Initializable {
 
     }
 
+    /**
+     * Filters displayed appointment table by String provided in the "Search by" text field.
+     * Method will first check if user provided an integer, in which case it will search by
+     * appointment ID.  Otherwise, it will search by appointment title. If no results are
+     * found, an error alert will pop up.
+     *
+     * @param text  The text input from user.
+     */
     public void filterTable(String text) throws SQLException {
 
         TableView tableView = null;
@@ -550,7 +653,8 @@ public class AppointmentController implements Initializable {
                 AlertPopups.generateErrorMessage(NO_RESULTS_ERROR_MESSAGE);
             } else {
                 for (Appointment appointment : appointmentList) {
-                    ResultSet rs = AppointmentQueries.selectAppointmentByTable(appointment.getTitle(), appointment.getDescription(), appointment.getStart());
+                    ResultSet rs = AppointmentQueries.selectAppointmentByTable(appointment.getTitle(),
+                            appointment.getDescription(), appointment.getStart());
                     rsList.add(rs);
                 }
                 refreshTable(tableView, rsList);
@@ -561,6 +665,11 @@ public class AppointmentController implements Initializable {
         }
     }
 
+    /**
+     * Method that fetches the necessary ResultSets and calls fillAppointmentTable()
+     * methods for all three appointment TableViews ("All", "Current Month", "Current Week")
+     * to reduce some redundancy.
+     */
     public void fillAllAppointmentTables() throws SQLException {
 
         ResultSet rsAll = AppointmentQueries.selectAllAppointments();
@@ -572,6 +681,10 @@ public class AppointmentController implements Initializable {
         fillAppointmentTable(currWeekTableView, rsWeek);
     }
 
+    /**
+     * Clears all Appointment text fields, sets combo boxes and DatePickers to default,
+     * and enables the Add button.
+     */
     public void clearFields() throws SQLException {
         idTextField.setText("auto-generated");
         titleTextField.clear();
@@ -586,7 +699,23 @@ public class AppointmentController implements Initializable {
         addButton.setDisable(false);
     }
 
-
+    /**
+     * Initializes the Appointment controller class. Populates combo boxes, dates, and tables.
+     * <p>
+     * Three lambda expressions are used, each being a listener.  The first sets the end date to equal
+     * start date once start date is chosen. This is because no appointment can last more than 14 hours
+     * (total number of hours the business is open). The second enables choosing the end hour and minute once
+     * start date is chosen.  The third accounts for potential spillover to following day depending on
+     * user's location, which would be necessary if the user's timezone was such that business hours extended
+     * beyond 11:59pm for user.
+     * <p>
+     * Each lambda expression allows for conciseness and is the most efficient way to handle listeners.
+     *
+     * @param url            Per Initializable javadoc reference: "The location used to resolve relative
+     *                       paths for the root object, or null if the location is not known."
+     * @param resourceBundle Per Initializable javadoc reference: "The resources used to
+     *                       localize the root object, or null if the root object was not localized."
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 

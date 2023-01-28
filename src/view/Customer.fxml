@@ -185,16 +185,24 @@
             </HBox>
             <HBox alignment="BOTTOM_RIGHT" layoutX="10.0" layoutY="283.0" prefHeight="42.0" prefWidth="800.0">
                <children>
-                  <TextField fx:id="customerFilterTextField" onAction="#onActionFilterCustomers" prefHeight="25.0" prefWidth="211.0" promptText="Search by Customer ID or Name">
-                     <HBox.margin>
-                        <Insets right="30.0" />
-                     </HBox.margin>
-                  </TextField>
-                  <Button fx:id="selectButton" alignment="CENTER" mnemonicParsing="false" onAction="#onActionSelectCustomer" prefHeight="20.0" prefWidth="75.0" style="-fx-background-radius: 10;" text="Select">
-                     <HBox.margin>
-                        <Insets right="30.0" />
-                     </HBox.margin>
-                  </Button>
+                  <VBox alignment="BOTTOM_LEFT" prefHeight="41.0" prefWidth="400.0">
+                     <children>
+                        <TextField fx:id="customerFilterTextField" maxWidth="211.0" onAction="#onActionFilterCustomers" prefHeight="25.0" prefWidth="211.0" promptText="Search by Customer ID or Name">
+                           <VBox.margin>
+                              <Insets left="30.0" />
+                           </VBox.margin>
+                        </TextField>
+                     </children>
+                  </VBox>
+                  <VBox alignment="BOTTOM_RIGHT" layoutX="64.0" layoutY="10.0" prefHeight="41.0" prefWidth="400.0">
+                     <children>
+                        <Button fx:id="selectButton" alignment="CENTER" mnemonicParsing="false" onAction="#onActionSelectCustomer" prefHeight="20.0" prefWidth="103.0" style="-fx-background-radius: 10;" text="Select">
+                           <VBox.margin>
+                              <Insets right="50.0" />
+                           </VBox.margin>
+                        </Button>
+                     </children>
+                  </VBox>
                </children>
                <VBox.margin>
                   <Insets />

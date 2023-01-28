@@ -270,17 +270,31 @@
             </HBox>
             <HBox alignment="BOTTOM_RIGHT" layoutX="10.0" layoutY="283.0" prefHeight="33.0" prefWidth="800.0">
                <children>
-                  <VBox alignment="BOTTOM_LEFT" prefHeight="33.0" prefWidth="457.0" />
-                  <TextField fx:id="appointmentFilterTextField" onAction="#onActionFilterAppointments" prefHeight="25.0" prefWidth="211.0" promptText="Search by Appointment ID or Title">
-                     <HBox.margin>
-                        <Insets right="30.0" />
-                     </HBox.margin>
-                  </TextField>
-                  <Button fx:id="selectButton" alignment="CENTER" mnemonicParsing="false" onAction="#onActionSelectAppointment" prefHeight="25.0" prefWidth="135.0" style="-fx-background-radius: 10;" text="Select">
-                     <HBox.margin>
-                        <Insets right="50.0" />
-                     </HBox.margin>
-                  </Button>
+                  <VBox alignment="BOTTOM_LEFT" prefHeight="33.0" prefWidth="457.0">
+                     <children>
+                        <HBox alignment="BOTTOM_LEFT" prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <TextField fx:id="appointmentFilterTextField" onAction="#onActionFilterAppointments" prefHeight="25.0" prefWidth="211.0" promptText="Search by Appt. ID or Title">
+                                 <HBox.margin>
+                                    <Insets left="30.0" />
+                                 </HBox.margin>
+                              </TextField>
+                           </children>
+                        </HBox>
+                     </children></VBox>
+                  <VBox alignment="BOTTOM_LEFT" layoutX="10.0" layoutY="10.0" prefHeight="33.0" prefWidth="457.0">
+                     <children>
+                        <HBox alignment="BOTTOM_RIGHT" prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Button fx:id="selectButton" alignment="CENTER" mnemonicParsing="false" onAction="#onActionSelectAppointment" prefHeight="25.0" prefWidth="103.0" style="-fx-background-radius: 10;" text="Select">
+                                 <HBox.margin>
+                                    <Insets right="50.0" />
+                                 </HBox.margin>
+                              </Button>
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
                </children>
                <VBox.margin>
                   <Insets />

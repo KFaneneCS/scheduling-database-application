@@ -1,4 +1,4 @@
-package controller;
+package model;
 
 import DAO.CountryQueries;
 import javafx.collections.FXCollections;

@@ -1,9 +1,10 @@
-package controller;
+package model;
 
 import DAO.CustomerQueries;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.Appointment;
+import model.AppointmentAccess;
 import model.Customer;
 import utility.AlertPopups;
 

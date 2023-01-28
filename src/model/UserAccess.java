@@ -1,4 +1,4 @@
-package controller;
+package model;
 
 import DAO.UserQueries;
 import javafx.collections.FXCollections;

@@ -1,6 +1,6 @@
 package utility;
 
-import controller.AppointmentAccess;
+import model.AppointmentAccess;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.Appointment;

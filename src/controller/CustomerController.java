@@ -10,7 +10,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.util.Callback;
-import model.Customer;
+import model.*;
 import utility.AlertPopups;
 import utility.SceneChanger;
 import utility.TimeHelper;
@@ -22,6 +22,16 @@ import java.sql.SQLException;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+/**
+ * Controller class which provides control logic for the various components of the Customers screen, including:
+ * adding, updating, selecting, and deleting customers; viewing all customers in a table that directly
+ * corresponds to the applicable customers table from the database (except that date/times are displayed in
+ * user's local time); and filtering table by ID or name.  Customers are added to, updated to, and deleted from
+ * both the database and their corresponding Customer objects.  To maintain relational integrity, all appointments
+ * associated with a given customer are deleted when that customer is deleted.
+ *
+ * @author Kyle Fanene
+ */
 public class CustomerController implements Initializable {
 
     private final ObservableList<String> countriesList = FXCollections
@@ -105,7 +115,13 @@ public class CustomerController implements Initializable {
     @FXML
     private Button updateButton;
 
-
+    /**
+     * Adds customer object and inserts information into database per user's input.
+     * <p>
+     * Logical validations are included to prevent empty fields or non-sequential time inputs.
+     *
+     * @param event Button to add customer.  Disabled when a customer is selected for update or deletion.
+     */
     @FXML
     void onActionAddCustomer(ActionEvent event) throws SQLException {
 
@@ -133,6 +149,13 @@ public class CustomerController implements Initializable {
 
     }
 
+    /**
+     * Clears text fields and resets all combo boxes.
+     * <p>
+     * Sets customerSelected boolean to false.
+     *
+     * @param event Button to clear fields/combo boxes.
+     */
     @FXML
     void onActionClearTextFields(ActionEvent event) {
 
@@ -149,10 +172,17 @@ public class CustomerController implements Initializable {
         customerSelected = false;
     }
 
+    /**
+     * Removes selected customer object and associated appointment objects and
+     * deletes information from database.
+     * <p>
+     * Logical validation checks that a customer was selected.
+     *
+     * @param event Button to delete customer.
+     */
     @FXML
     void onActionDeleteCustomer(ActionEvent event) {
 
-        System.out.println("TEST:  Total number of customers BEFORE delete = " + CustomerAccess.getAllCustomers().size());
         if (!customerSelected) {
             AlertPopups.generateErrorMessage(SELECTION_ERROR_MESSAGE);
         } else {
@@ -164,7 +194,6 @@ public class CustomerController implements Initializable {
                     int customerId = Integer.parseInt(idTextField.getText());
                     CustomerAccess.executeDelete(CustomerAccess.lookupCustomer(customerId));
                     fillCustomerTable();
-                    System.out.println("TEST:  Total number of customers AFTER delete = " + CustomerAccess.getAllCustomers().size());
 
                 }
             } catch (Exception e) {
@@ -174,11 +203,23 @@ public class CustomerController implements Initializable {
         }
     }
 
+    /**
+     * Changes screen to home (Welcome).
+     *
+     * @param event Back button, which returns to home screen.
+     */
     @FXML
     void onActionDisplayWelcome(ActionEvent event) throws IOException {
         sceneChanger.changeScreen(event, "Welcome");
     }
 
+    /**
+     * Populates text fields and combo boxes with selected customer's information.
+     * <p>
+     * Logical validation checks that a customer was selected.
+     *
+     * @param event Button to select customer.
+     */
     @FXML
     void onActionSelectCustomer(ActionEvent event) {
 
@@ -207,6 +248,11 @@ public class CustomerController implements Initializable {
         }
     }
 
+    /**
+     * Filters customer table by Customer ID or Name.
+     *
+     * @param event Filter text field when user presses Enter.
+     */
     @FXML
     void onActionFilterCustomers(ActionEvent event) throws SQLException {
         String searchText = customerFilterTextField.getText();

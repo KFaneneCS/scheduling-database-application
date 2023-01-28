@@ -193,7 +193,7 @@ public class Appointment {
     /**
      * Getter for user who created appointment.
      *
-     * @return User who created appointment..
+     * @return User who created appointment.
      */
     public String getCreatedBy() {
         return createdBy;
