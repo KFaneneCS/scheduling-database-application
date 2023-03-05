@@ -5,10 +5,9 @@ The purpose of this application is to provide the user a seamless way to interac
 All user login activity is logged.  
 The user is able to view both customer and appointment tables from the database, with dates and times displayed in user's local time.
 
-Author:  		        Kyle Fanene
-Contact Information:  		kfanene@wgu.edu
+Author:  		            Kyle Fanene
 Application version:  		1.0.0
-Date:  			        January 30, 2023
+Date:  			            January 30, 2023
 
 IDE, module/driver information:
 - IntelliJ IDEA 2021.1.3 (Community Edition)
@@ -28,6 +27,3 @@ How to run program:
 - Exit program either by the default method for your operating system, or by navigating to
     the Welcome screen and clicking "Exit."
 
-Description of additional report:
-The third report on the Reports screen calculates the total number of customers by country.
-This report provides the user the exact distribution of customers by country.
