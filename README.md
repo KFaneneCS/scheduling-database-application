@@ -9,4 +9,4 @@ This project was developed as part of a university course to create a GUI-based 
 - Scene Builder: Used for designing JavaFX UI layouts visually
 
 ## Live Demo
-[Watch the Video](https://drive.google.com/file/d/1D4quE1mHIBGvLONAubL0zA64RUPgptlt/view?usp=sharing](https://drive.google.com/file/d/1kxHRll7kfrCRj8bL2LCk1BDsH_V4aTrH/view?usp=sharing)
+[Watch the Video](https://drive.google.com/file/d/1kxHRll7kfrCRj8bL2LCk1BDsH_V4aTrH/view?usp=sharing)
